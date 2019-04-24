@@ -8,6 +8,7 @@ const uniques = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 
 const tens = [undefined, undefined, 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
 const getNumberInEnglish = number => {
+    translateMagnitudeSlices(magnitudeSlicesToArray(number));
     number = parseInt(number);
     return translateUnderTwoThousand(number);
 }
@@ -43,4 +44,42 @@ const translateUnderHundred = number => {
     return underHundred;
 }
 
-module.exports = getNumberInEnglish;
+const magnitudeSlicesToArray = (number) => {
+    const magnitudeSlices = [];
+    const thousandMagnitudeSize = 3;
+    const sliceFirstMagnitudeInNumber = number.length % thousandMagnitudeSize;
+    let actualHundred = '';
+    let counter = 0;
+
+    if (sliceFirstMagnitudeInNumber !== 0) {
+        actualHundred += number.slice(0, sliceFirstMagnitudeInNumber);
+        magnitudeSlices.push(actualHundred);
+        actualHundred = '';
+    }
+    
+    for (let i = sliceFirstMagnitudeInNumber + 1; i <= number.length; i++) {     
+        actualHundred += number[i - 1];
+        counter++;
+        if (counter === 3) {
+            magnitudeSlices.push(actualHundred);
+            actualHundred = '';
+            counter = 0;
+        }
+    }
+    return magnitudeSlices;
+}
+
+const translateMagnitudeSlices = (magnitudeSlices) => {
+    const translatedMagnitudeSlices = [];
+    magnitudeSlices.forEach(element => {
+        element = translateUnderTwoThousand(parseInt(element));
+        translatedMagnitudeSlices.push(element);
+    })
+    console.log('translatedMagnitudeSlices: ', translatedMagnitudeSlices);
+    return translatedMagnitudeSlices;
+}
+
+//module.exports = getNumberInEnglish;
+module.exports.getNumberInEnglish = getNumberInEnglish;
+module.exports.magnitudeSlicesToArray = magnitudeSlicesToArray;
+module.exports.translateMagnitudeSlices = translateMagnitudeSlices;

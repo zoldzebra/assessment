@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Button, Form} from 'react-bootstrap';
-import getNumberInEnglish from '../functions/getNumberInEnglish.js'
+import {getNumberInEnglish} from '../functions/getNumberInEnglish.js'
 
 class NumberTranslator extends Component {
   constructor(props) {
