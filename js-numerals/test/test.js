@@ -21,4 +21,7 @@ describe('JS numerals tests', () => {
     it('should discard zeros in the beginning of number', () => {
         expect(getNumberInEnglish('00013')).to.equal('thirteen');
     });
+    it('should translate under 2000', () => {
+        expect(getNumberInEnglish('1999')).to.equal('nineteen hundred and ninety-nine');
+    });
 });

@@ -7,10 +7,31 @@
 const uniques = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelwe', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const tens = [undefined, undefined, 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
-const getNumberInEnglish = number => translateUnderHundred(number);
-
-const translateUnderHundred = (number) => {
+const getNumberInEnglish = number => {
     number = parseInt(number);
+    return translateUnderTwoThousand(number);
+}
+
+
+const translateUnderTwoThousand = number => {
+    let underTwoThousand = '';
+
+    if (number > 99) {
+        const hundreds = Math.floor(number / 100);
+        underTwoThousand += uniques[hundreds] + ' hundred';
+        if (number - hundreds * 100 === 0) {
+            return underTwoThousand;
+        } else {
+            number -= hundreds * 100;
+            underTwoThousand += ' and ' + translateUnderHundred(number)
+        };
+    } else {
+        underTwoThousand = translateUnderHundred(number);
+    }
+    return underTwoThousand;
+}
+
+const translateUnderHundred = number => {
     let underHundred = '';
     if (number < 20) {
         underHundred += uniques[number];
