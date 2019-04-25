@@ -5,7 +5,7 @@ const magnitudeNames = ['', 'thousand', 'million', 'billion', 'trillion', 'quadr
 const getNumberInEnglish = number => {
     let numberInEnglish = '';
 
-    numberInEnglish = isTooLarge(number) 
+    numberInEnglish = isTooLarge(number)
         ? numberInEnglish = 'Too large number. Sorry, I only translate between +/- 1 quintillion.'
         : isNegative(number)
         ? numberInEnglish = 'minus ' + translate(number.slice(1, number.length))
@@ -16,9 +16,11 @@ const getNumberInEnglish = number => {
 
 const translate = number => {
     let numberInEnglish = '';
+
     parseInt(number) >= 2000
         ? numberInEnglish = addAnd(addMagnitudeSizes(translateMagnitudeSlices(magnitudeSlicesToArray(number)))).join(' ').trim()
         : numberInEnglish = translateUnderTwoThousand(parseInt(number));
+
     return numberInEnglish;
 }
 
@@ -37,11 +39,13 @@ const translateUnderTwoThousand = number => {
     } else {
         underTwoThousand = translateUnderHundred(number);
     }
+
     return underTwoThousand;
 }
 
 const translateUnderHundred = number => {
     let underHundred = '';
+
     if (number < 20) {
         underHundred += uniques[number];
     } else if (number % 10 === 0) {
@@ -49,6 +53,7 @@ const translateUnderHundred = number => {
     } else if (number < 100) {
         underHundred += tens[(number - number % 10) / 10] + '-' + uniques[number % 10];
     }
+
     return underHundred;
 }
 
@@ -74,26 +79,31 @@ const magnitudeSlicesToArray = number => {
             counter = 0;
         }
     }
+
     return magnitudeSlices;
 }
 
 const translateMagnitudeSlices = magnitudeSlices => {
     const translatedMagnitudeSlices = [];
+
     magnitudeSlices.forEach(element => {
         element = translateUnderTwoThousand(parseInt(element));
         translatedMagnitudeSlices.push(element);
     })
+
     return translatedMagnitudeSlices;
 }
 
 const addMagnitudeSizes = translatedMagnitudeSlices => {
     const translatedSlicesWithMagnitudes = [];
+
     translatedMagnitudeSlices.forEach((element, index) => {
         if (element !== 'zero') {
             element += ' ' + magnitudeNames[translatedMagnitudeSlices.length - index - 1];
             translatedSlicesWithMagnitudes.push(element);
         }
     })
+
     return translatedSlicesWithMagnitudes;
 }
 
@@ -105,6 +115,7 @@ const addAnd = translatedSlicesWithMagnitudes => {
             .push(translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 1]);
         translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 2] = 'and';
     }
+    
     return translatedSlicesWithMagnitudes;
 }
 

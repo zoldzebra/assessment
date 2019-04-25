@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Button, Form, Container, Col, Row} from 'react-bootstrap';
 import {getNumberInEnglish} from '../functions/getNumberInEnglish.js'
 
 class NumberTranslator extends Component {
@@ -25,15 +25,28 @@ class NumberTranslator extends Component {
   render() {
     return (
       <div>
-        <div className="col-lg-6">
-          <Form onSubmit={this.handleSubmit}>
-              <Form.Label>Enter an integer!</Form.Label>
-              <Form.Control type="number" placeholder="Only integers please" onChange={this.handleChange}/>
-            
-            <Button variant="primary" type="submit">Submit</Button>
-          </Form>
-          {this.state.numberInEnglish}
-        </div>
+
+          <Container>
+            <Row>
+              <Col></Col>
+              <Col md="7">
+                <div className="text-center">
+                  <Form onSubmit={this.handleSubmit} >
+                    <Form.Label column="true">Enter an integer number you wish to translate to English!</Form.Label>
+                    <br></br>
+                    <Form.Control type="number" placeholder="your number here" onChange={this.handleChange}/>
+                    <br></br>
+                    <Button variant="primary" type="submit">Translate!</Button>
+                  </Form>
+                  <br></br>
+                  <p>Your number in English:</p>
+                  <p><b>{this.state.numberInEnglish}</b></p>
+                </div>
+              </Col>
+              <Col></Col>
+            </Row>
+          </Container>
+
       </div>
     );
   }  
