@@ -18,7 +18,7 @@ const translate = number => {
     let numberInEnglish = '';
 
     parseInt(number) >= 2000
-        ? numberInEnglish = addAnd(addMagnitudeSizes(translateMagnitudeSlices(magnitudeSlicesToArray(number)))).join(' ').trim()
+        ? numberInEnglish = addAnd(addMagnitudeSizes(translateSlices(sliceNumberByMagnitudes(number)))).join(' ').trim()
         : numberInEnglish = translateUnderTwoThousand(parseInt(number));
 
     return numberInEnglish;
@@ -50,14 +50,14 @@ const translateUnderHundred = number => {
         underHundred += uniques[number];
     } else if (number % 10 === 0) {
         underHundred += tens[number / 10];
-    } else if (number < 100) {
+    } else {
         underHundred += tens[(number - number % 10) / 10] + '-' + uniques[number % 10];
     }
 
     return underHundred;
 }
 
-const magnitudeSlicesToArray = number => {
+const sliceNumberByMagnitudes = number => {
     const magnitudeSlices = [];
     const thousandMagnitudeSize = 3;
     const sliceFirstMagnitudeInNumber = number.length % thousandMagnitudeSize;
@@ -70,8 +70,8 @@ const magnitudeSlicesToArray = number => {
         actualHundred = '';
     }
     
-    for (let i = sliceFirstMagnitudeInNumber + 1; i <= number.length; i++) {     
-        actualHundred += number[i - 1];
+    for (let i = sliceFirstMagnitudeInNumber; i <= number.length; i++) {
+        actualHundred += number[i];
         counter++;
         if (counter === 3) {
             magnitudeSlices.push(actualHundred);
@@ -83,23 +83,17 @@ const magnitudeSlicesToArray = number => {
     return magnitudeSlices;
 }
 
-const translateMagnitudeSlices = magnitudeSlices => {
-    const translatedMagnitudeSlices = [];
-
-    magnitudeSlices.forEach(element => {
-        element = translateUnderTwoThousand(parseInt(element));
-        translatedMagnitudeSlices.push(element);
-    })
-
-    return translatedMagnitudeSlices;
+const translateSlices = magnitudeSlices => {
+    return magnitudeSlices.map(element =>
+        element = translateUnderTwoThousand(parseInt(element)));
 }
 
-const addMagnitudeSizes = translatedMagnitudeSlices => {
+const addMagnitudeSizes = translatedSlices => {
     const translatedSlicesWithMagnitudes = [];
 
-    translatedMagnitudeSlices.forEach((element, index) => {
+    translatedSlices.forEach((element, index) => {
         if (element !== 'zero') {
-            element += ' ' + magnitudeNames[translatedMagnitudeSlices.length - index - 1];
+            element += ' ' + magnitudeNames[translatedSlices.length - index - 1];
             translatedSlicesWithMagnitudes.push(element);
         }
     })
@@ -115,7 +109,7 @@ const addAnd = translatedSlicesWithMagnitudes => {
             .push(translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 1]);
         translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 2] = 'and';
     }
-    
+
     return translatedSlicesWithMagnitudes;
 }
 
@@ -128,5 +122,5 @@ const isTooLarge = number => {
 }
 
 module.exports.getNumberInEnglish = getNumberInEnglish;
-module.exports.magnitudeSlicesToArray = magnitudeSlicesToArray;
-module.exports.translateMagnitudeSlices = translateMagnitudeSlices;
+module.exports.sliceNumberByMagnitudes = sliceNumberByMagnitudes;
+module.exports.translateSlices = translateSlices;
