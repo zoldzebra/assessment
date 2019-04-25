@@ -26,6 +26,19 @@ describe('Translation tests', () => {
     it('should translate under 2000', () => {
         expect(getNumberInEnglish('1999')).to.equal('nineteen hundred and ninety-nine');
     });
+    it('should translate over 2000', () => {
+        expect(getNumberInEnglish('2001')).to.equal('two thousand and one');
+        expect(getNumberInEnglish('17999')).to.equal('seventeen thousand nine hundred and ninety-nine');
+    });
+    it('should translate 0 as silent when has 0 of that magnitude (like 2000, 12000123)', () => {
+        expect(getNumberInEnglish('2000')).to.equal('two thousand');
+        expect(getNumberInEnglish('2000000')).to.equal('two million');
+        expect(getNumberInEnglish('12000123')).to.equal('twelwe million one hundred and twenty-three');
+    });
+    it('should use \'and\' if there are 0 hundreds but there are tens or ones (like 70001, 12000023)', () => {
+        expect(getNumberInEnglish('12000023')).to.equal('twelwe million and twenty-three');
+        expect(getNumberInEnglish('70001')).to.equal('seventy thousand and one');
+    });
 });
 describe('magnitudeSlice array tests', () => {
     it('should return an array', () => {

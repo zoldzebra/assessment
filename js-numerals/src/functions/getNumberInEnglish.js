@@ -2,7 +2,11 @@ const uniques = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 
 const tens = [undefined, undefined, 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 const magnitudeNames = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion'];
 
-const getNumberInEnglish = number => addMagnitudeSizes(translateMagnitudeSlices(magnitudeSlicesToArray(number))).join(' ').trim();
+const getNumberInEnglish = number => {
+    return parseInt(number) >= 2000
+        ? addAnd(addMagnitudeSizes(translateMagnitudeSlices(magnitudeSlicesToArray(number)))).join(' ').trim()
+        : translateUnderTwoThousand(parseInt(number));
+}
 
 const translateUnderTwoThousand = number => {
     let underTwoThousand = '';
@@ -65,17 +69,31 @@ const translateMagnitudeSlices = magnitudeSlices => {
         element = translateUnderTwoThousand(parseInt(element));
         translatedMagnitudeSlices.push(element);
     })
-    console.log('translatedMagnitudeSlices: ', translatedMagnitudeSlices);
+    console.log('translatedMagnitudeSlices', translatedMagnitudeSlices);
     return translatedMagnitudeSlices;
 }
 
 const addMagnitudeSizes = translatedMagnitudeSlices => {
     const translatedSlicesWithMagnitudes = [];
     translatedMagnitudeSlices.forEach((element, index) => {
-        element += ' ' + magnitudeNames[translatedMagnitudeSlices.length - index - 1];
-        translatedSlicesWithMagnitudes.push(element);
+        if (element !== 'zero') {
+            element += ' ' + magnitudeNames[translatedMagnitudeSlices.length - index - 1];
+            translatedSlicesWithMagnitudes.push(element);
+        }
     })
-    console.log('translatedSlicesWithMagnitudes: ', translatedSlicesWithMagnitudes);
+    console.log(translatedSlicesWithMagnitudes)
+    return translatedSlicesWithMagnitudes;
+}
+
+const addAnd = translatedSlicesWithMagnitudes => {
+    if (translatedSlicesWithMagnitudes.length > 1
+        &&!translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 1].includes('hundred'))
+        {
+        translatedSlicesWithMagnitudes
+            .push(translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 1]);
+        translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 2] = 'and';
+    }
+    console.log(translatedSlicesWithMagnitudes);
     return translatedSlicesWithMagnitudes;
 }
 
