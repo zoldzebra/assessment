@@ -3,9 +3,23 @@ const tens = [undefined, undefined, 'twenty', 'thirty', 'forty', 'fifty', 'sixty
 const magnitudeNames = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion'];
 
 const getNumberInEnglish = number => {
-    return parseInt(number) >= 2000
-        ? addAnd(addMagnitudeSizes(translateMagnitudeSlices(magnitudeSlicesToArray(number)))).join(' ').trim()
-        : translateUnderTwoThousand(parseInt(number));
+    let numberInEnglish = '';
+
+    numberInEnglish = isTooLarge(number) 
+        ? numberInEnglish = 'Too large number. Sorry, I only translate between +/- 1 quintillion.'
+        : isNegative(number)
+        ? numberInEnglish = 'minus ' + translate(number.slice(1, number.length))
+        : numberInEnglish = translate(number)
+
+    return numberInEnglish;
+}
+
+const translate = number => {
+    let numberInEnglish = '';
+    parseInt(number) >= 2000
+        ? numberInEnglish = addAnd(addMagnitudeSizes(translateMagnitudeSlices(magnitudeSlicesToArray(number)))).join(' ').trim()
+        : numberInEnglish = translateUnderTwoThousand(parseInt(number));
+    return numberInEnglish;
 }
 
 const translateUnderTwoThousand = number => {
@@ -69,7 +83,6 @@ const translateMagnitudeSlices = magnitudeSlices => {
         element = translateUnderTwoThousand(parseInt(element));
         translatedMagnitudeSlices.push(element);
     })
-    console.log('translatedMagnitudeSlices', translatedMagnitudeSlices);
     return translatedMagnitudeSlices;
 }
 
@@ -81,7 +94,6 @@ const addMagnitudeSizes = translatedMagnitudeSlices => {
             translatedSlicesWithMagnitudes.push(element);
         }
     })
-    console.log(translatedSlicesWithMagnitudes)
     return translatedSlicesWithMagnitudes;
 }
 
@@ -93,8 +105,15 @@ const addAnd = translatedSlicesWithMagnitudes => {
             .push(translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 1]);
         translatedSlicesWithMagnitudes[translatedSlicesWithMagnitudes.length - 2] = 'and';
     }
-    console.log(translatedSlicesWithMagnitudes);
     return translatedSlicesWithMagnitudes;
+}
+
+const isNegative = number => {
+    return number[0] === '-';
+}
+
+const isTooLarge = number => {
+    return Math.abs(parseInt(number)) >= 10 ** 18 ? true : false;
 }
 
 module.exports.getNumberInEnglish = getNumberInEnglish;

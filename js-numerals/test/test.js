@@ -39,6 +39,13 @@ describe('Translation tests', () => {
         expect(getNumberInEnglish('12000023')).to.equal('twelwe million and twenty-three');
         expect(getNumberInEnglish('70001')).to.equal('seventy thousand and one');
     });
+    it('should work with negative numbers', () => {
+        expect(getNumberInEnglish('-1999')).to.equal('minus nineteen hundred and ninety-nine');
+        expect(getNumberInEnglish('-2001')).to.equal('minus two thousand and one');
+        expect(getNumberInEnglish('-12000023')).to.equal('minus twelwe million and twenty-three');
+        expect(getNumberInEnglish('-70001')).to.equal('minus seventy thousand and one');
+        expect(getNumberInEnglish('-1234567890123456789')).to.equal('Too large number. Sorry, I only translate between +/- 1 quintillion.');
+    });
 });
 describe('magnitudeSlice array tests', () => {
     it('should return an array', () => {
