@@ -1,18 +1,8 @@
-// 7    == seven
-// 42   == forty-two
-// 2001 == two thousand and one
-// 1999 == nineteen hundred and ninety-nine
-// 17999 == seventeen thousand nine hundred and ninety-nine
-
 const uniques = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelwe', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const tens = [undefined, undefined, 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+const magnitudeNames = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion'];
 
-const getNumberInEnglish = number => {
-    translateMagnitudeSlices(magnitudeSlicesToArray(number));
-    number = parseInt(number);
-    return translateUnderTwoThousand(number);
-}
-
+const getNumberInEnglish = number => addMagnitudeSizes(translateMagnitudeSlices(magnitudeSlicesToArray(number))).join(' ').trim();
 
 const translateUnderTwoThousand = number => {
     let underTwoThousand = '';
@@ -44,7 +34,7 @@ const translateUnderHundred = number => {
     return underHundred;
 }
 
-const magnitudeSlicesToArray = (number) => {
+const magnitudeSlicesToArray = number => {
     const magnitudeSlices = [];
     const thousandMagnitudeSize = 3;
     const sliceFirstMagnitudeInNumber = number.length % thousandMagnitudeSize;
@@ -69,7 +59,7 @@ const magnitudeSlicesToArray = (number) => {
     return magnitudeSlices;
 }
 
-const translateMagnitudeSlices = (magnitudeSlices) => {
+const translateMagnitudeSlices = magnitudeSlices => {
     const translatedMagnitudeSlices = [];
     magnitudeSlices.forEach(element => {
         element = translateUnderTwoThousand(parseInt(element));
@@ -79,7 +69,16 @@ const translateMagnitudeSlices = (magnitudeSlices) => {
     return translatedMagnitudeSlices;
 }
 
-//module.exports = getNumberInEnglish;
+const addMagnitudeSizes = translatedMagnitudeSlices => {
+    const translatedSlicesWithMagnitudes = [];
+    translatedMagnitudeSlices.forEach((element, index) => {
+        element += ' ' + magnitudeNames[translatedMagnitudeSlices.length - index - 1];
+        translatedSlicesWithMagnitudes.push(element);
+    })
+    console.log('translatedSlicesWithMagnitudes: ', translatedSlicesWithMagnitudes);
+    return translatedSlicesWithMagnitudes;
+}
+
 module.exports.getNumberInEnglish = getNumberInEnglish;
 module.exports.magnitudeSlicesToArray = magnitudeSlicesToArray;
 module.exports.translateMagnitudeSlices = translateMagnitudeSlices;
