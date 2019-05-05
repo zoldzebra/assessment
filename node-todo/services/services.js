@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-const dbFilePath = './db/db.json';
+const dbFilePath = require('../env');
 
 exports.loadDbFile = () => {
     console.log('loading db...');

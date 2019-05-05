@@ -7,7 +7,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(logger('dev'));
-// app.use('/', (req, res) => res.send('Server runs.'));
+
 router(app);
 
 
