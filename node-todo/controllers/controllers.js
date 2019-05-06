@@ -26,7 +26,13 @@ createTodo = function(req, res) {
 updateById = function(req, res) {
     const id = parseInt(req.params.id);
     const result = services.updateTodoById(id, req.body);
-    services.isError(result) ? res.status(400).send(result) : res.send(result);  // http status?    
+    services.isError(result) ? res.status(400).send(result) : res.send(result);
 }
 
-module.exports = {getTodos, getTodoById, createTodo, updateById};
+deleteById = function(req, res) {
+    const id = parseInt(req.params.id);
+    const result = services.deleteTodoById(id);
+    services.isError(result) ? res.status(404).send(result) : res.sendStatus(200);
+}
+
+module.exports = {getTodos, getTodoById, createTodo, updateById, deleteById};

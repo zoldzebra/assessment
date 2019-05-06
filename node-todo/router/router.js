@@ -12,6 +12,7 @@ module.exports = function(app) {
 
     app.route('/todos/:id')
         .get(controllers.getTodoById)
-        .put(controllers.updateById);
+        .put(controllers.updateById)
+        .delete(controllers.deleteById);
 
 }

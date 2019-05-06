@@ -62,6 +62,17 @@ updateTodoById = (id, todo) => {
     }    
 }
 
+deleteTodoById = (id) => {
+    const index = findTodoIndexById(id);
+    if (index === -1) {
+        return {findOneByIdError : errors.dbFindOneError};
+    } else {
+        cacheDb.splice(index, 1);
+        saveCacheDbToFile();
+        return {};
+    }
+}
+
 correctTodoFormat = (todo) => {
     const validityErrors = validateTodo(todo);
 
@@ -111,4 +122,4 @@ useDefaults = (todo) => {
     return todo;
 }
 
-module.exports = {cacheDb, getCacheDb, saveNewTodo, getTodoById, updateTodoById, correctTodoFormat, isError, validateTodo, useDefaults, loadDbToCache};
+module.exports = {cacheDb, getCacheDb, saveNewTodo, getTodoById, updateTodoById, deleteTodoById, correctTodoFormat, isError, validateTodo, useDefaults, loadDbToCache};
