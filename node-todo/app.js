@@ -10,6 +10,5 @@ app.use(logger('dev'));
 
 router(app);
 
-
 module.exports = app;
 

@@ -31,9 +31,9 @@ describe('GET /todos', () => {
 describe('POST /todos', () => {
     it('it should POST a todo properly', (done) => {
         const todo = {
-            text: "test todo",
-            priority: 1,
-            done: false
+            "text": "testTodo",
+            "priority": 1,
+            "done": false
         }
         chai.request(server)
             .post('/todos')
