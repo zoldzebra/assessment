@@ -32,7 +32,7 @@ describe('GET /todos', () => {
 });
 
 describe('POST /todos', () => {
-    it('it should POST a well formed todo properly', (done) => {        
+    it('it should POST a well formed todo properly', (done) => {
         const todo = {
             "text": "testTodo",
             "priority": 1,

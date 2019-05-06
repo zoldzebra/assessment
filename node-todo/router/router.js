@@ -4,7 +4,7 @@ module.exports = function(app) {
     app.route('/')
         .get(function(req, res) {
             res.send('Server runs.');
-        })
+        });
 
     app.route('/todos')
         .get(controllers.getTodos)
