@@ -4,28 +4,62 @@ const errors = {
     invalidText: "Only English letters allowed in text property, it is required.",
     invalidPriority: "Only null or integers between 1-5 allowed in priority property",
     invalidDone: "Only null or boolean type allowed in done property",
-    dbFindOneError: "Something went wrong while getting todo by id. Probably the id is invalid."
+    dbFindOneError: "Something went wrong while getting todo by id. Probably the id is invalid.",
+}
+let cacheDb = [];
+
+getCacheDb = () => {
+    return cacheDb;
 }
 
-loadDbFile = () => {
-    console.log('loading db...');
-    let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
-    return db;
+getTodoById= (id) => {
+    const index = findTodoIndexById(id);
+    return index != -1 
+        ? cacheDb[index]
+        : {findOneByIdError : errors.dbFindOneError}
+    }
+
+loadDbToCache = () => {
+    // console.log('loading db to CACHE...');
+    cacheDb = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+    // console.log('db in CACHE:', cacheDb);
 };
 
-saveToDbFile = (db) => {
-    console.log('saving db...');
-    fs.writeFileSync(dbFilePath, JSON.stringify(db));
-};
-
-findOneById = (id) => {
-    const db = loadDbFile();
-    let findOneByIdError = {};
-    const findOneTodo = db.filter(todo => todo.id === id);
-    return findOneTodo.length != 1
-        ? findOneByIdError = {findOneByIdError: errors.dbFindOneError}
-        : findOneTodo[0];
+saveNewTodo = (newTodo) => {
+    saveToCacheDb(newTodo);
+    saveCacheDbToFile();
 }
+
+saveToCacheDb = (todo) => {
+    cacheDb.push(todo);
+}
+
+saveCacheDbToFile = (todo) => {
+    // console.log('db in CACHE:', cacheDb);
+    // console.log('saving db from CACHE...');
+    fs.writeFileSync(dbFilePath, JSON.stringify(cacheDb));
+};
+
+
+findTodoIndexById = (id) => {
+    return cacheDb.findIndex(todo => todo.id === id);
+}
+
+updateTodoById = (id, newTodo) => {
+    let updateByIdError = {};
+    const oldTodo = findOneById(id);
+    console.log('old todo:', oldTodo);
+    if (oldTodo.hasOwnProperty("findOneByIdError")) {
+        return oldTodo;
+    } else {
+        const updatedTodo = Object.assign(oldTodo, newTodo);
+        console.log('updating old todo to...', updatedTodo);
+        Object.assign(oldTodo, newTodo);
+        return updatedTodo;
+    }    
+}
+
+
 
 validateTodo = (newTodo) => {
     const validityErrors = {};
@@ -51,4 +85,4 @@ checkDefaults = (newTodo) => {
     return newTodo;
 }
 
-module.exports = {loadDbFile, saveToDbFile, findOneById, validateTodo, checkDefaults};
+module.exports = {cacheDb, saveNewTodo, getTodoById, validateTodo, checkDefaults, loadDbToCache, getCacheDb};
