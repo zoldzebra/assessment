@@ -1,5 +1,4 @@
 const fs = require('fs');
-
 const dbFilePath = require('../env');
 const errors = {
     invalidText: "Only English letters allowed in text property, it is required.",
@@ -8,19 +7,19 @@ const errors = {
     dbFindOneError: "Something went wrong while getting todo by id. Probably the id is invalid."
 }
 
-exports.loadDbFile = () => {
+loadDbFile = () => {
     console.log('loading db...');
     let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
-    console.log('db:', db);
     return db;
 };
 
-exports.saveToDbFile = (db) => {
+saveToDbFile = (db) => {
     console.log('saving db...');
     fs.writeFileSync(dbFilePath, JSON.stringify(db));
 };
 
-exports.findOneById = (id, db) => {
+findOneById = (id) => {
+    const db = loadDbFile();
     let findOneByIdError = {};
     const findOneTodo = db.filter(todo => todo.id === id);
     return findOneTodo.length != 1
@@ -28,7 +27,7 @@ exports.findOneById = (id, db) => {
         : findOneTodo[0];
 }
 
-exports.validateTodo = (newTodo) => {
+validateTodo = (newTodo) => {
     const validityErrors = {};
     const onlyEnglishLetters = /^[a-z]+$/i;
     if (!onlyEnglishLetters.test(newTodo.text)) {
@@ -46,8 +45,10 @@ exports.validateTodo = (newTodo) => {
     return validityErrors;
 }
 
-exports.checkDefaults = (newTodo) => {
+checkDefaults = (newTodo) => {
     newTodo.priority === null ? newTodo.priority = 3 : null;
     newTodo.done === null ? newTodo.done = false : null;
     return newTodo;
 }
+
+module.exports = {loadDbFile, saveToDbFile, findOneById, validateTodo, checkDefaults};
