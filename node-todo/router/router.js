@@ -10,4 +10,7 @@ module.exports = function(app) {
         .get(controllers.getTodos)
         .post(controllers.createTodo);
 
+    app.route('/todos/:id')
+        .get(controllers.getTodoById);
+
 }

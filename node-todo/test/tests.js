@@ -34,7 +34,7 @@ describe('GET /todos', () => {
 describe('POST /todos', () => {
     it('it should POST a well formed todo properly', (done) => {
         const todo = {
-            "text": "testTodo",
+            "text": "testTodoPOST",
             "priority": 1,
             "done": false
         }
@@ -59,7 +59,7 @@ describe('POST /todos', () => {
         let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
         const dbStartingLenth = db.length;
         const todo = {
-            "text": "testTodo",
+            "text": "testTodoPOST",
             "priority": 1,
             "done": false
         }
@@ -74,7 +74,7 @@ describe('POST /todos', () => {
     });
     it('it should use defaults if "priority" or "done" is null', (done) => {
         const todo = {
-            "text": "testDefaults",
+            "text": "testTodoPOST",
             "priority": null,
             "done": null
         }
@@ -102,6 +102,31 @@ describe('POST /todos', () => {
                 res.should.have.status(400);
                 res.body.should.be.a('object');
                 res.body.should.have.property('invalidText');
+                done();
+            });
+    });
+});
+
+describe('GET /todos/:id', () => {
+    it('it should GET todo by "id"', (done) => {
+        const db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const id = db[0].id;
+        chai.request(server)
+            .get('/todos/' + id)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                expect(res.body.id).to.equal(id);
+                done();
+            });
+    });
+    it('it should GET findOneById error with invalid "id"', (done) => {
+        chai.request(server)
+            .get('/todos/00001' )
+            .end((err, res) => {
+                res.should.have.status(404);
+                res.body.should.be.a('object');
+                res.body.should.have.property('findOneByIdError');
                 done();
             });
     });

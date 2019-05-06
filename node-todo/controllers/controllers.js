@@ -7,6 +7,13 @@ exports.getTodos = function(req, res) {
     res.send(db);
 };
 
+exports.getTodoById = function(req, res) {
+    const id = parseInt(req.params.id);
+    const db = services.loadDbFile();
+    const result = services.findOneById(id, db);
+    result.hasOwnProperty("findOneByIdError") ? res.status(404).send(result) : res.send(result);
+};
+
 exports.createTodo = function(req, res) {
     console.log('creating todo...');
     let newTodo = req.body;
@@ -14,7 +21,6 @@ exports.createTodo = function(req, res) {
     const validityErrors = services.validateTodo(newTodo);
 
     if (Object.entries(validityErrors).length != 0) {
-        console.error('Invalid request format:\n', validityErrors);
         res.status(400).send(validityErrors);
     } else {
         let db = services.loadDbFile();

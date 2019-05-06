@@ -4,7 +4,8 @@ const dbFilePath = require('../env');
 const errors = {
     invalidText: "Only English letters allowed in text property, it is required.",
     invalidPriority: "Only null or integers between 1-5 allowed in priority property",
-    invalidDone: "Only null or boolean type allowed in done property"
+    invalidDone: "Only null or boolean type allowed in done property",
+    dbFindOneError: "Something went wrong while getting todo by id. Probably the id is invalid."
 }
 
 exports.loadDbFile = () => {
@@ -18,6 +19,14 @@ exports.saveToDbFile = (db) => {
     console.log('saving db...');
     fs.writeFileSync(dbFilePath, JSON.stringify(db));
 };
+
+exports.findOneById = (id, db) => {
+    let findOneByIdError = {};
+    const findOneTodo = db.filter(todo => todo.id === id);
+    return findOneTodo.length != 1
+        ? findOneByIdError = {findOneByIdError: errors.dbFindOneError}
+        : findOneTodo[0];
+}
 
 exports.validateTodo = (newTodo) => {
     const validityErrors = {};
