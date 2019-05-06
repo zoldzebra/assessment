@@ -14,7 +14,6 @@ exports.createTodo = function(req, res) {
     const validityErrors = services.validateTodo(newTodo);
 
     if (Object.entries(validityErrors).length != 0) {
-        console.log('valid check', validityErrors != {});
         console.error('Invalid request format:\n', validityErrors);
         res.status(400).send(validityErrors);
     } else {

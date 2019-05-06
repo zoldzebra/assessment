@@ -1,7 +1,10 @@
-let chai = require('chai');
-let chaiHttp = require('chai-http');
-let server = require('../app');
-let should = chai.should();
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../app');
+const expect = require('chai').expect;
+const should = chai.should();
+const dbFilePath = require('../env');
+const fs = require('fs');
 
 chai.use(chaiHttp);
 
@@ -23,13 +26,13 @@ describe('GET /todos', () => {
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('array');
-            done();
+                done();
             });       
     });
 });
 
 describe('POST /todos', () => {
-    it('it should POST a todo properly', (done) => {
+    it('it should POST a well formed todo properly', (done) => {        
         const todo = {
             "text": "testTodo",
             "priority": 1,
@@ -49,7 +52,57 @@ describe('POST /todos', () => {
                 res.body.priority.should.be.a('number');
                 res.body.should.have.property('done').eql(todo.done);
                 res.body.done.should.be.a('boolean');
-            done();
+                done();
             });
-    }); 
+    });
+    it('it should write to db', (done) => {
+        let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const dbStartingLenth = db.length;
+        const todo = {
+            "text": "testTodo",
+            "priority": 1,
+            "done": false
+        }
+        chai.request(server)
+            .post('/todos')
+            .send(todo)
+            .then(() => {
+                db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+                expect(db.length).to.equal(dbStartingLenth + 1);
+                done();
+            })
+    });
+    it('it should use defaults if "priority" or "done" is null', (done) => {
+        const todo = {
+            "text": "testDefaults",
+            "priority": null,
+            "done": null
+        }
+        chai.request(server)
+            .post('/todos')
+            .send(todo)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('priority').eql(3);
+                res.body.should.have.property('done').eql(false);
+                done();
+            });
+    });
+    it('it should respond with 400 and validity errors if todo is invalid', (done) => {
+        const todo = {
+            "text": 12323,
+            "priority": 1,
+            "done": false
+        }
+        chai.request(server)
+            .post('/todos')
+            .send(todo)
+            .end((err, res) => {
+                res.should.have.status(400);
+                res.body.should.be.a('object');
+                res.body.should.have.property('invalidText');
+                done();
+            });
+    });
 });
