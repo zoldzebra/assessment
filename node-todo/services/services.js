@@ -1,6 +1,7 @@
 const fs = require('fs');
 const dbFilePath = require('../env');
 const errors = {
+    invalidProperty: "Invalid property!",
     invalidText: "Only English letters allowed in text property, it is required.",
     invalidPriority: "Only null or integers between 1-5 allowed in priority property",
     invalidDone: "Only null or boolean type allowed in done property",
@@ -26,6 +27,7 @@ loadDbToCache = () => {
 };
 
 saveNewTodo = (newTodo) => {
+    newTodo.id = Date.now();
     saveToCacheDb(newTodo);
     saveCacheDbToFile();
 }
@@ -34,9 +36,7 @@ saveToCacheDb = (todo) => {
     cacheDb.push(todo);
 }
 
-saveCacheDbToFile = (todo) => {
-    // console.log('db in CACHE:', cacheDb);
-    // console.log('saving db from CACHE...');
+saveCacheDbToFile = () => {
     fs.writeFileSync(dbFilePath, JSON.stringify(cacheDb));
 };
 
@@ -45,44 +45,70 @@ findTodoIndexById = (id) => {
     return cacheDb.findIndex(todo => todo.id === id);
 }
 
-updateTodoById = (id, newTodo) => {
-    let updateByIdError = {};
-    const oldTodo = findOneById(id);
-    console.log('old todo:', oldTodo);
-    if (oldTodo.hasOwnProperty("findOneByIdError")) {
-        return oldTodo;
+updateTodoById = (id, todo) => {
+    const index = findTodoIndexById(id);
+    if (index === -1) {
+        return {findOneByIdError : errors.dbFindOneError};
     } else {
-        const updatedTodo = Object.assign(oldTodo, newTodo);
-        console.log('updating old todo to...', updatedTodo);
-        Object.assign(oldTodo, newTodo);
-        return updatedTodo;
+        const result = validateTodo(todo);
+        if (isError(result)) {
+            return result;
+        } else {
+            const oldTodo = cacheDb[index];
+            cacheDb[index] = Object.assign(oldTodo, todo);
+            saveCacheDbToFile();
+            return cacheDb[index];
+        }
     }    
 }
 
+correctTodoFormat = (todo) => {
+    const validityErrors = validateTodo(todo);
 
+    if (isError(validityErrors)) {
+        return validityErrors;
+    } else {
+        return useDefaults(todo);
+    }
+}
 
-validateTodo = (newTodo) => {
-    const validityErrors = {};
+isError = (result) => {
+    return !(result.hasOwnProperty("text") || !Object.keys(result).length) ? true : false;
+}
+
+validateTodo = (todo) => {
+    const result = {};
     const onlyEnglishLetters = /^[a-z]+$/i;
-    if (!onlyEnglishLetters.test(newTodo.text)) {
-        validityErrors.invalidText = errors.invalidText
+    const invalidProperty = Object.keys(todo).
+        findIndex(property => !(property === "text" || property === "priority" || property === "done"));
+
+    console.log('invalidProperty:', invalidProperty, Object.keys(todo));
+
+    if (invalidProperty != -1) {
+        result.propertyError = errors.invalidProperty
     }
-    if (!((Number.isInteger(newTodo.priority))
-        && (newTodo.priority > 0 && newTodo.priority < 6)
-        || newTodo.priority === null)) {
-        validityErrors.invalidPriority = errors.invalidPriority;
+
+    if (!onlyEnglishLetters.test(todo.text)) {
+        result.textError = errors.invalidText
     }
-    if (!(typeof newTodo.done === 'boolean' || newTodo.done === null)) {
-        validityErrors.invalidDone = errors.invalidDone;
+    if (!((Number.isInteger(todo.priority))
+        && (todo.priority > 0 && todo.priority < 6)
+        || todo.priority === null
+        || todo.priority === undefined)) {
+            result.priorityError = errors.invalidPriority;
     }
-    console.log('validityErrors =', validityErrors);
-    return validityErrors;
+    if (!(typeof todo.done === 'boolean'
+        || todo.done === null
+        || todo.done === undefined)) {
+            result.doneError = errors.invalidDone;
+    }
+    return result;
 }
 
-checkDefaults = (newTodo) => {
-    newTodo.priority === null ? newTodo.priority = 3 : null;
-    newTodo.done === null ? newTodo.done = false : null;
-    return newTodo;
+useDefaults = (todo) => {
+    (todo.priority === null || todo.priority === undefined) ? todo.priority = 3 : null;
+    (todo.done === null || todo.done === undefined) ? todo.done = false : null;
+    return todo;
 }
 
-module.exports = {cacheDb, saveNewTodo, getTodoById, validateTodo, checkDefaults, loadDbToCache, getCacheDb};
+module.exports = {cacheDb, getCacheDb, saveNewTodo, getTodoById, updateTodoById, correctTodoFormat, isError, validateTodo, useDefaults, loadDbToCache};

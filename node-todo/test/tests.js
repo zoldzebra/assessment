@@ -101,7 +101,7 @@ describe('POST /todos', () => {
             .end((err, res) => {
                 res.should.have.status(400);
                 res.body.should.be.a('object');
-                res.body.should.have.property('invalidText');
+                res.body.should.have.property('textError');
                 done();
             });
     });
