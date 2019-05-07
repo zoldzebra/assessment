@@ -1,7 +1,7 @@
 const services = require('../services/services');
 
 getTodos = function(req, res) {
-    res.send(services.getCacheDb());
+    res.send(services.loadDbToCache());
 };
 
 getTodoById = function(req, res) {

@@ -5,7 +5,7 @@ const environments = {
     },
     'dev': {
         'db': './db/db.json',
-        'timer': 2000
+        'timer': 5 * 60 * 1000
     }
 };
 

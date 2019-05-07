@@ -8,15 +8,11 @@ const errors = {
     dbFindOneError: "Something went wrong while getting todo by id. Probably the id is invalid.",
 }
 let cacheDb = [];
-const deleteByDones = [];
-const deleteByDonesTime = actualEnvironment.timer;
+const deleteList = [];
+const deleteTime = actualEnvironment.timer;
 const dbFilePath = actualEnvironment.db;
 
-getCacheDb = () => {
-    return cacheDb;
-}
-
-getTodoById= (id) => {
+getTodoById = (id) => {
     const index = findTodoIndexById(id);
     return index != -1 
         ? cacheDb[index]
@@ -25,6 +21,7 @@ getTodoById= (id) => {
 
 loadDbToCache = () => {
     cacheDb = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+    return cacheDb;
 };
 
 saveNewTodo = (newTodo) => {
@@ -41,7 +38,6 @@ saveCacheDbToFile = () => {
     fs.writeFileSync(dbFilePath, JSON.stringify(cacheDb));
 };
 
-
 findTodoIndexById = (id) => {
     return cacheDb.findIndex(todo => todo.id === id);
 }
@@ -57,9 +53,7 @@ updateTodoById = (id, todo) => {
         } else {
             const oldTodo = cacheDb[index];
             cacheDb[index] = Object.assign(oldTodo, todo);
-            if (cacheDb[index].done === true) {
-                timedDeleteOfDone(id);
-            }
+            timedDeleteManager(cacheDb[index]);
             saveCacheDbToFile();
             return cacheDb[index];
         }
@@ -77,15 +71,24 @@ deleteTodoById = (id) => {
     }
 }
 
-timedDeleteOfDone = (id) => {
-    const alreadyMarkedForDelete = deleteByDones.findIndex(deathRowId => deathRowId === id);
-    if (alreadyMarkedForDelete === -1) {
-        deleteByDones.push(id);
-        setTimeout(() => {
-            deleteTodoById(id);
-            deleteByDones.splice(alreadyMarkedForDelete, 1);
-        }, deleteByDonesTime);
+timedDeleteManager = (todo) => {
+    if (todo.done && !isMarkedForDelete(todo.id)) {
+        deleteList.push(todo.id);
+        timedDelete(todo.id);
+    } else if (isMarkedForDelete(todo.id)) {
+        deleteList.splice(getDeleteListIndex(todo.id), 1);
     }
+}
+
+timedDelete = (id) => {
+    const deleteListIndex = getDeleteListIndex(id);
+    setTimeout(() => {
+        if (isMarkedForDelete(id)) {
+            deleteTodoById(id);
+            deleteList.splice(deleteListIndex, 1);
+        } else {
+        }
+    }, deleteTime);
 }
 
 correctTodoFormat = (todo) => {
@@ -98,33 +101,30 @@ correctTodoFormat = (todo) => {
     }
 }
 
-isError = (result) => {
-    return !(result.hasOwnProperty("text") || !Object.keys(result).length) ? true : false;
-}
-
 validateTodo = (todo) => {
     const result = {};
-    const onlyEnglishLetters = /^[a-z]+$/i;
-    const invalidProperty = Object.keys(todo).
-        findIndex(property => !(property === "text" || property === "priority" || property === "done"));
-
-    if (invalidProperty != -1) {
-        result.propertyError = errors.invalidProperty
-    }
-    if (!onlyEnglishLetters.test(todo.text)) {
-        result.textError = errors.invalidText
-    }
-    if (!((Number.isInteger(todo.priority))
+    const validText = /^[a-z\s]+$/i;
+    const validProperty = !(Object.keys(todo)
+        .findIndex(property =>
+            !(property === "text" || property === "priority" || property === "done"))
+            != -1)
+    const validPriority = ((Number.isInteger(todo.priority))
         && (todo.priority > 0 && todo.priority < 6)
         || todo.priority === null
-        || todo.priority === undefined)) {
-            result.priorityError = errors.invalidPriority;
-    }
-    if (!(typeof todo.done === 'boolean'
+        || todo.priority === undefined);
+    const validDone = (typeof todo.done === 'boolean'
         || todo.done === null
-        || todo.done === undefined)) {
-            result.doneError = errors.invalidDone;
-    }
+        || todo.done === undefined);
+
+    !validProperty
+        ? result.propertyError = errors.invalidProperty : null;
+    !validText.test(todo.text)
+        ? result.textError = errors.invalidText : null;
+    !validPriority
+        ? result.priorityError = errors.invalidPriority : null;
+    !validDone
+        ? result.doneError = errors.invalidDone : null;
+
     return result;
 }
 
@@ -134,4 +134,16 @@ useDefaults = (todo) => {
     return todo;
 }
 
-module.exports = {cacheDb, getCacheDb, saveNewTodo, getTodoById, updateTodoById, deleteTodoById, correctTodoFormat, isError, validateTodo, useDefaults, loadDbToCache};
+isError = (result) => {
+    return !(result.hasOwnProperty("text") || !Object.keys(result).length);
+}
+
+isMarkedForDelete = (id) => {
+    return getDeleteListIndex(id) != -1;
+}
+
+getDeleteListIndex = (id) => {
+    return deleteList.findIndex(deathRowId => deathRowId === id);
+}
+
+module.exports = {cacheDb, saveNewTodo, getTodoById, updateTodoById, deleteTodoById, correctTodoFormat, isError, validateTodo, useDefaults, loadDbToCache};

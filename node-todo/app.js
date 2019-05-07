@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(logger('dev'));
 
 router(app);
-loadDbToCache();
+services.loadDbToCache();
 
 module.exports = app;
 
