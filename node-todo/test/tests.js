@@ -3,8 +3,12 @@ const chaiHttp = require('chai-http');
 const server = require('../app');
 const expect = require('chai').expect;
 const should = chai.should();
-const dbFilePath = require('../env');
+const actualEnvironment = require('../env');
 const fs = require('fs');
+
+const dbFilePath = actualEnvironment.db;
+const deleteByDonesTime = actualEnvironment.timer;
+const timeGap = 1000;
 
 chai.use(chaiHttp);
 
@@ -140,7 +144,7 @@ describe('PUT /todos/:id', () => {
         const newTodo = {
             "text": "putThis",
             "priority": 1,
-            "done": true
+            "done": false
         };
         chai.request(server)
             .put('/todos/' + oldTodo.id)
@@ -272,6 +276,27 @@ describe('DELETE /todos/:id', () => {
                 expect(db.length).to.equal(dbStartingLength);
                 expect(db[0].id).to.equal(deleteTodo.id);
                 done();
+            });
+    });
+});
+describe('PUT + DELETE /todos/:id', () => {
+    it('it should delete todo with done = true after ' + deleteByDonesTime + 'ms in testing\nChecking it after ' + (deleteByDonesTime + timeGap) + 'ms.', (done) => {
+        let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const dbStartingLength = db.length;
+        const oldTodo = db[0];
+        const updateTodo = {
+            "done": true
+        }
+        chai.request(server)
+            .put('/todos/'+ oldTodo.id)
+            .send(updateTodo)
+            .then(() => {
+                setTimeout(() => {
+                    db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+                    expect(db.length).to.equal(dbStartingLength - 1);
+                    expect(db.find(todo => todo.id === oldTodo.id)).to.be.undefined;
+                    done();
+                }, deleteByDonesTime + timeGap);
             });
     });
 });

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const dbFilePath = require('../env');
+const actualEnvironment = require('../env');
 const errors = {
     invalidProperty: "Invalid property!",
     invalidText: "Only English letters allowed in text property, it is required.",
@@ -8,6 +8,9 @@ const errors = {
     dbFindOneError: "Something went wrong while getting todo by id. Probably the id is invalid.",
 }
 let cacheDb = [];
+const deleteByDones = [];
+const deleteByDonesTime = actualEnvironment.timer;
+const dbFilePath = actualEnvironment.db;
 
 getCacheDb = () => {
     return cacheDb;
@@ -21,9 +24,7 @@ getTodoById= (id) => {
 };
 
 loadDbToCache = () => {
-    // console.log('loading db to CACHE...');
     cacheDb = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
-    // console.log('db in CACHE:', cacheDb);
 };
 
 saveNewTodo = (newTodo) => {
@@ -56,6 +57,9 @@ updateTodoById = (id, todo) => {
         } else {
             const oldTodo = cacheDb[index];
             cacheDb[index] = Object.assign(oldTodo, todo);
+            if (cacheDb[index].done === true) {
+                timedDeleteOfDone(id);
+            }
             saveCacheDbToFile();
             return cacheDb[index];
         }
@@ -70,6 +74,17 @@ deleteTodoById = (id) => {
         cacheDb.splice(index, 1);
         saveCacheDbToFile();
         return {};
+    }
+}
+
+timedDeleteOfDone = (id) => {
+    const alreadyMarkedForDelete = deleteByDones.findIndex(deathRowId => deathRowId === id);
+    if (alreadyMarkedForDelete === -1) {
+        deleteByDones.push(id);
+        setTimeout(() => {
+            deleteTodoById(id);
+            deleteByDones.splice(alreadyMarkedForDelete, 1);
+        }, deleteByDonesTime);
     }
 }
 

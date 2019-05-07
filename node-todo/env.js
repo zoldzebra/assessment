@@ -1,8 +1,14 @@
-const dbFiles = {
-    'test': './db/test_db.json',
-    'dev': './db/db.json'
+const environments = {
+    'test': {
+        'db': './db/test_db.json',
+        'timer': 2000
+    },
+    'dev': {
+        'db': './db/db.json',
+        'timer': 2000
+    }
 };
 
-const dbFilePath = dbFiles[process.env.NODE_ENV];
+const actualEnvironment = environments[process.env.NODE_ENV];
 
-module.exports = dbFilePath;
+module.exports = actualEnvironment;

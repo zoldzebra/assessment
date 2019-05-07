@@ -10,7 +10,6 @@ getTodoById = function(req, res) {
 };
 
 createTodo = function(req, res) {
-    console.log('creating todo...');
     let newTodo = req.body;  
 
     const result = services.correctTodoFormat(newTodo);
