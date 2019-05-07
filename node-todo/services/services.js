@@ -18,7 +18,7 @@ getTodoById= (id) => {
     return index != -1 
         ? cacheDb[index]
         : {findOneByIdError : errors.dbFindOneError}
-    }
+};
 
 loadDbToCache = () => {
     // console.log('loading db to CACHE...');
@@ -93,12 +93,9 @@ validateTodo = (todo) => {
     const invalidProperty = Object.keys(todo).
         findIndex(property => !(property === "text" || property === "priority" || property === "done"));
 
-    console.log('invalidProperty:', invalidProperty, Object.keys(todo));
-
     if (invalidProperty != -1) {
         result.propertyError = errors.invalidProperty
     }
-
     if (!onlyEnglishLetters.test(todo.text)) {
         result.textError = errors.invalidText
     }

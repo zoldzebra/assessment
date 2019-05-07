@@ -57,7 +57,7 @@ describe('POST /todos', () => {
     });
     it('it should write to db', (done) => {
         let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
-        const dbStartingLenth = db.length;
+        const dbStartingLength = db.length;
         const todo = {
             "text": "testTodoPOST",
             "priority": 1,
@@ -68,7 +68,7 @@ describe('POST /todos', () => {
             .send(todo)
             .then(() => {
                 db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
-                expect(db.length).to.equal(dbStartingLenth + 1);
+                expect(db.length).to.equal(dbStartingLength + 1);
                 done();
             })
     });
@@ -116,7 +116,7 @@ describe('GET /todos/:id', () => {
             .end((err, res) => {
                 res.should.have.status(200);
                 res.body.should.be.a('object');
-                expect(res.body.id).to.equal(id);
+                res.body.should.have.property('id').eql(id);
                 done();
             });
     });
@@ -127,6 +127,150 @@ describe('GET /todos/:id', () => {
                 res.should.have.status(404);
                 res.body.should.be.a('object');
                 res.body.should.have.property('findOneByIdError');
+                done();
+            });
+    });
+});
+
+describe('PUT /todos/:id', () => {
+    it('it should update todo with PUT', (done) => {
+        const db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const dbStartingLength = db.length;
+        const oldTodo = db[0]
+        const newTodo = {
+            "text": "putThis",
+            "priority": 1,
+            "done": true
+        };
+        chai.request(server)
+            .put('/todos/' + oldTodo.id)
+            .send(newTodo)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('id').eql(oldTodo.id);
+                res.body.should.have.property('text').eql(newTodo.text);
+                res.body.should.have.property('priority').eql(newTodo.priority);
+                res.body.should.have.property('done').eql(newTodo.done);
+                done();
+            });
+    });
+    it('it should throw error message on invalid todo form', (done) => {
+        const db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const oldTodo = db[1]
+        const updatedTodo = {
+            "text": 123,
+            "invalidproperty": "michael bay"
+        };
+        chai.request(server)
+            .put('/todos/' + oldTodo.id)
+            .send(updatedTodo)
+            .end((err, res) => {
+                res.should.have.status(400);
+                res.body.should.be.a('object');
+                res.body.should.have.property('textError');
+                res.body.should.have.property('propertyError');
+                done();
+            });
+    });
+    it('it should throw error message if "id" is tried to sent in', (done) => {
+        const db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const oldTodo = db[1]
+        const updatedTodo = {
+            "id": 123,
+        };
+        chai.request(server)
+            .put('/todos/' + oldTodo.id)
+            .send(updatedTodo)
+            .end((err, res) => {
+                res.should.have.status(400);
+                res.body.should.be.a('object');
+                res.body.should.have.property('propertyError');
+                done();
+            });
+    });
+    it('it should not change todo if empty object is sent', (done) => {
+        const db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const oldTodo = db[1]
+        const updatedTodo = {};
+        chai.request(server)
+            .put('/todos/' + oldTodo.id)
+            .send(updatedTodo)
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.be.a('object');
+                res.body.should.have.property('id').eql(oldTodo.id);
+                res.body.should.have.property('text').eql(oldTodo.text);
+                res.body.should.have.property('priority').eql(oldTodo.priority);
+                res.body.should.have.property('done').eql(oldTodo.done);
+                done();
+            });
+    });
+    it('it should mutate todo in db if valid todo sent', (done) => {
+        let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const dbStartingLength = db.length;
+        const oldTodo = db[1];
+        const newTodo = {
+            "text": "putThis",
+            "priority": 1,
+            "done": false
+        }
+        chai.request(server)
+            .put('/todos/'+ oldTodo.id)
+            .send(newTodo)
+            .then(() => {
+                db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+                expect(db.length).to.equal(dbStartingLength);
+                expect(db[1].id).to.equal(oldTodo.id);
+                expect(db[1].text).to.equal(newTodo.text);
+                expect(db[1].priority).to.equal(newTodo.priority);
+                expect(db[1].done).to.equal(newTodo.done);
+                done();
+            })
+    });
+    it('it should NOT mutate todo in db if empty todo sent', (done) => {
+        let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const dbStartingLength = db.length;
+        const oldTodo = db[1];
+        const emptyTodo = {};
+        chai.request(server)
+            .put('/todos/'+ oldTodo.id)
+            .send(emptyTodo)
+            .then(() => {
+                db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+                expect(db.length).to.equal(dbStartingLength);
+                expect(db[1].id).to.equal(oldTodo.id);
+                expect(db[1].text).to.equal(oldTodo.text);
+                expect(db[1].priority).to.equal(oldTodo.priority);
+                expect(db[1].done).to.equal(oldTodo.done);
+                done();
+            })
+    });
+});
+describe('DELETE /todos/:id', () => {
+    it('it should delete todo', (done) => {
+        let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const dbStartingLength = db.length;
+        const deleteTodo = db[0]
+        chai.request(server)
+            .delete('/todos/'+ deleteTodo.id)
+            .then(() => {
+                db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+                expect(db.length).to.equal(dbStartingLength - 1);
+                expect(db.find(todo => todo.id === deleteTodo.id)).to.be.undefined;
+                done();
+            });
+    });
+    it('it should not delete todo with invalid id', (done) => {
+        let db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+        const dbStartingLength = db.length;
+        const deleteTodo = db[0]
+        chai.request(server)
+            .delete('/todos/'+ 999)
+            .then((err, res) => {
+                db = JSON.parse(fs.readFileSync(dbFilePath, 'utf8'));
+                expect(db.length).to.equal(dbStartingLength);
+                expect(db[0].id).to.equal(deleteTodo.id);
                 done();
             });
     });

@@ -14,7 +14,6 @@ createTodo = function(req, res) {
     let newTodo = req.body;  
 
     const result = services.correctTodoFormat(newTodo);
-    console.log('result', result);
     if (services.isError(result)) {
         res.status(400).send(result)
     } else {
