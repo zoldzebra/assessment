@@ -86,7 +86,6 @@ timedDelete = (id) => {
         if (isMarkedForDelete(id)) {
             deleteTodoById(id);
             deleteList.splice(deleteListIndex, 1);
-        } else {
         }
     }, deleteTime);
 }
