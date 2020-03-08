@@ -3,6 +3,7 @@ import {
   Paper, Button, makeStyles, Grid,
 } from '@material-ui/core';
 
+import { User } from '../types/User';
 import UserCard from './UserCard';
 
 const useStyles = makeStyles({
@@ -10,16 +11,6 @@ const useStyles = makeStyles({
     padding: '10px',
   },
 });
-
-interface User {
-  id: number;
-  first_name: string;
-  last_name: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  url: string;
-}
 
 export interface UserListProps {
   users: User[];

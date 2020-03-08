@@ -1,22 +1,14 @@
 import React from 'react';
 import { Paper, Box, makeStyles } from '@material-ui/core';
 
+import { User } from '../types/User';
+
 const useStyles = makeStyles({
   card: {
     minWidth: 650,
     padding: '10px',
   },
 });
-
-interface User {
-  id: number;
-  first_name: string;
-  last_name: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  url: string;
-}
 
 export interface UserCardProps {
   user: User;

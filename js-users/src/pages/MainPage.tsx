@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles, CircularProgress } from '@material-ui/core';
 
 import { getUsers } from '../utils/api';
+import { User } from '../types/User';
 import UserList from '../components/UserList';
 
 const useStyles = makeStyles({
@@ -11,16 +12,6 @@ const useStyles = makeStyles({
 });
 
 export interface MainPageProps { }
-
-interface User {
-  id: number;
-  first_name: string;
-  last_name: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  url: string;
-}
 
 const MainPage: React.FC<MainPageProps> = (props) => {
   const classes = useStyles();
