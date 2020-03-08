@@ -4,14 +4,11 @@
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
-    "prettier/@typescript-eslint",
-    "plugin:prettier/recommended",
     "plugin:import/typescript"
   ],
   "plugins": [
     "react",
     "@typescript-eslint",
-    "prettier"
   ],
   "env": {
     "browser": true,
@@ -19,12 +16,6 @@
     "jest": true
   },
   "rules": {
-    "prettier/prettier": [
-      "warn",
-      {
-        "singleQuote": true
-      }
-    ],
     "import/extensions": [
       "error",
       "always",
@@ -43,7 +34,8 @@
           ".tsx"
         ]
       }
-    ]
+    ],
+    "react/prop-types": 0
   },
   "settings": {
     "react": {

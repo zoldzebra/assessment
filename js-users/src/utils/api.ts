@@ -11,7 +11,6 @@ export const getUsers = async () => {
     );
     return response.data;
   } catch (error) {
-    throw new Error("Getting users failed.");
+    throw new Error('Getting users failed.');
   }
 };
-

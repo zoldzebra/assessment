@@ -1,22 +1,38 @@
 import React from 'react';
-import { Paper, Box } from '@material-ui/core';
+import { Paper, Box, makeStyles } from '@material-ui/core';
 
-export interface UserCardProps {
-  firstName: string;
-  lastName: string;
+const useStyles = makeStyles({
+  card: {
+    minWidth: 650,
+    padding: '10px',
+  },
+});
+
+interface User {
+  id: number;
+  first_name: string;
+  last_name: string;
   status: string;
+  created_at: string;
+  updated_at: string;
+  url: string;
 }
 
-const UserCard: React.FC<UserCardProps> = ({
-  firstName,
-  lastName,
-  status
-}) => (
-    <Paper>
-      <Box>{firstName}</Box>
-      <Box>{lastName}</Box>
-      <Box>{status}</Box>
+export interface UserCardProps {
+  user: User;
+}
+
+const UserCard: React.FC<UserCardProps> = ({ user }) => {
+  const classes = useStyles();
+
+  return (
+    <Paper className={classes.card}>
+      <Box>{`id: ${user.id}`}</Box>
+      <Box>{user.first_name}</Box>
+      <Box>{user.last_name}</Box>
+      <Box>{user.status}</Box>
     </Paper>
   );
+};
 
 export default UserCard;

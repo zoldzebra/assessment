@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { CircularProgress } from '@material-ui/core';
+import { makeStyles, CircularProgress } from '@material-ui/core';
 
 import { getUsers } from '../utils/api';
-import UserCard from '../components/UserCard';
+import UserList from '../components/UserList';
+
+const useStyles = makeStyles({
+  card: {
+    padding: '10px',
+  },
+});
 
 export interface MainPageProps { }
 
@@ -16,12 +22,13 @@ interface User {
   url: string;
 }
 
-const MainPage: React.FC<MainPageProps> = props => {
+const MainPage: React.FC<MainPageProps> = (props) => {
+  const classes = useStyles();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState({
     isError: false,
-    message: null
+    message: null,
   });
 
   useEffect(() => {
@@ -35,31 +42,17 @@ const MainPage: React.FC<MainPageProps> = props => {
         setIsLoading(false);
         setErrorInfo({
           isError: true,
-          message: error.message
+          message: error.message,
         });
       }
     };
     queryUsers();
   }, []);
-
-  console.log('users', users);
-
-  const renderUsers = () => {
-    return users.map(user => (
-      <UserCard
-        key={user.url}
-        firstName={user.first_name}
-        lastName={user.last_name}
-        status={user.status}
-      />
-    ));
-  };
-
   return (
     <>
-      {isLoading && (<CircularProgress />)}
+      {isLoading && <CircularProgress />}
       {errorInfo.isError && errorInfo.message ? errorInfo.message : null}
-      {users.length > 0 && renderUsers()}
+      <UserList users={users} />
     </>
   );
 };
