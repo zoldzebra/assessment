@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import axios from 'axios';
 
 import { User } from '../types/User';
@@ -60,6 +61,7 @@ export const addNewUser = async (firstName: string, lastName: string) => {
       newUser,
     );
     console.log('add resp', response);
+    return response;
   } catch (error) {
     throw new Error(`Adding user failed: ${error.message}`);
   }

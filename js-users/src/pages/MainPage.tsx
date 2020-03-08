@@ -51,11 +51,6 @@ const MainPage: React.FC<MainPageProps> = ({ history }) => {
     setUsers(newUsers);
   };
 
-  const findUserById = (id: number) => {
-    const selectedUser = users.find((user) => user.id === id);
-    console.log('selectedUser', selectedUser);
-  };
-
   return (
     <>
       {isLoading && <CircularProgress />}

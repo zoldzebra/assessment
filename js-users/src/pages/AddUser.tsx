@@ -1,15 +1,16 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import React, { useState, ChangeEvent } from 'react';
-import {
-  Paper, Button, Input,
-} from '@material-ui/core';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
+import { Paper } from '@material-ui/core';
 
 import { addNewUser } from '../utils/api';
 import { ErrorInfo } from '../types/ErrorInfo';
 import ErrorMessage from '../components/ErrorMessage';
+import AddOrEditUserForm from '../components/AddOrEditUserForm';
 
-export interface AddUserProps { }
+export type AddUserProps = RouteComponentProps
 
-const AddUser: React.FC<AddUserProps> = (props) => {
+const AddUser: React.FC<AddUserProps> = ({ history }) => {
   const emptyState = {
     first_name: '',
     last_name: '',
@@ -31,9 +32,9 @@ const AddUser: React.FC<AddUserProps> = (props) => {
   };
 
   const handleSave = async () => {
-    console.log('handleSave');
     try {
       await addNewUser(user.first_name, user.last_name);
+      history.push('/main');
     } catch (error) {
       setErrorInfo({
         isError: true,
@@ -52,29 +53,18 @@ const AddUser: React.FC<AddUserProps> = (props) => {
     />
   );
 
-  console.log('adduser state', user);
-
-
   return (
     <Paper>
-      Add user
-      <Input name="firstName" value={user?.first_name} onChange={handleInputs} />
-      <Input name="lastName" value={user?.last_name} onChange={handleInputs} />
-      <Button
-        variant="contained"
-        onClick={handleSave}
-      >
-        SAVE!
-      </Button>
-      {/* <Button
-        variant="contained"
-        onClick={backToMainPage}
-      >
-        Back
-      </Button> */}
+      <AddOrEditUserForm
+        title="Add user"
+        firstName={user.first_name}
+        lastName={user.last_name}
+        handleInputs={handleInputs}
+        handleSave={handleSave}
+      />
       {errorInfo.isError && renderErrorMessage()}
     </Paper>
   );
 };
 
-export default AddUser;
+export default withRouter(AddUser);

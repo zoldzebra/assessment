@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import {
-  Paper, Button, FormControl, Input,
-} from '@material-ui/core';
+import { Paper } from '@material-ui/core';
 
-import { getUserById, updateUser, API } from '../utils/api';
+import { getUserById, updateUser } from '../utils/api';
 import { User } from '../types/User';
 import { ErrorInfo } from '../types/ErrorInfo';
 import ErrorMessage from '../components/ErrorMessage';
+import AddOrEditUserForm from '../components/AddOrEditUserForm';
 
 interface RouteParams {
   id: string;
@@ -27,7 +26,6 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
     url: '',
   };
   const [user, setUser] = useState<User>(emptyState);
-  const [isLoading, setIsLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState<ErrorInfo>({
     isError: false,
     message: '',
@@ -38,12 +36,9 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
   useEffect(() => {
     const queryUser = async () => {
       try {
-        setIsLoading(true);
         const result = await getUserById(Number(id));
         setUser({ ...result });
-        setIsLoading(false);
       } catch (error) {
-        setIsLoading(false);
         setErrorInfo({
           isError: true,
           message: error.message,
@@ -63,16 +58,12 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
     }
   };
 
-  const backToMainPage = () => {
-    history.push('/main');
-  };
-
   const handleSave = async () => {
     console.log('handleSave');
     try {
       const saved = await updateUser(user);
       if (saved) {
-        backToMainPage();
+        history.push('/main');
       }
     } catch (error) {
       setErrorInfo({
@@ -94,21 +85,13 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
 
   return (
     <Paper>
-      Edit user
-      <Input name="firstName" value={user?.first_name} onChange={handleInputs} />
-      <Input name="lastName" value={user?.last_name} onChange={handleInputs} />
-      <Button
-        variant="contained"
-        onClick={handleSave}
-      >
-        SAVE!
-      </Button>
-      <Button
-        variant="contained"
-        onClick={backToMainPage}
-      >
-        Back
-      </Button>
+      <AddOrEditUserForm
+        title="Edit user"
+        firstName={user.first_name}
+        lastName={user.last_name}
+        handleInputs={handleInputs}
+        handleSave={handleSave}
+      />
       {errorInfo.isError && renderErrorMessage()}
     </Paper>
   );
