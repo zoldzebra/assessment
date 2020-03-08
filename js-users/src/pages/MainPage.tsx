@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles, CircularProgress } from '@material-ui/core';
 
-import { getUsers } from '../utils/api';
+import { getUsers, getUserById } from '../utils/api';
 import { User } from '../types/User';
 import UserList from '../components/UserList';
 
@@ -39,11 +39,20 @@ const MainPage: React.FC<MainPageProps> = (props) => {
     };
     queryUsers();
   }, []);
+
+  const updateUserById = async (id: number) => {
+    const updatedUser = await getUserById(id);
+    const oldUserIndex = users.findIndex((user) => user.id === id);
+    const newUsers = [...users];
+    newUsers[oldUserIndex] = Object.assign(newUsers[oldUserIndex], updatedUser);
+    setUsers(newUsers);
+  };
+
   return (
     <>
       {isLoading && <CircularProgress />}
       {errorInfo.isError && errorInfo.message ? errorInfo.message : null}
-      <UserList users={users} />
+      <UserList users={users} onStatusUpdate={updateUserById} />
     </>
   );
 };

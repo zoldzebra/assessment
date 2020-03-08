@@ -14,14 +14,15 @@ const useStyles = makeStyles({
 
 export interface UserListProps {
   users: User[];
+  onStatusUpdate: (id: number) => void;
 }
 
-const UserList: React.FC<UserListProps> = ({ users }) => {
+const UserList: React.FC<UserListProps> = ({ users, onStatusUpdate }) => {
   const classes = useStyles();
   const USERS_PER_PAGE = 10;
-  const [actualPage, setActualPage] = useState(53);
+  const [actualPage, setActualPage] = useState(0);
   const showPage = actualPage + 1;
-  const totalPages = Math.ceil(users.length / USERS_PER_PAGE); // TODO remainder users
+  const totalPages = Math.ceil(users.length / USERS_PER_PAGE);
 
   const getPagination = () => {
     const start = actualPage * 10;
@@ -46,12 +47,11 @@ const UserList: React.FC<UserListProps> = ({ users }) => {
 
   const renderUserCards = () => {
     const pagination = getPagination();
-
     const actualPageUsers = users.slice(pagination.start, pagination.end);
 
     return actualPageUsers.map((user) => (
       <Grid item key={user.id}>
-        <UserCard user={user} />
+        <UserCard user={user} onStatusUpdate={onStatusUpdate} />
       </Grid>
     ));
   };
