@@ -5,9 +5,9 @@ import {
 } from '@material-ui/core';
 
 import { User } from '../types/User';
-import { Error } from '../types/Error';
+import { ErrorInfo } from '../types/ErrorInfo';
 import { updateUser } from '../utils/api';
-import { ErrorMessage } from './ErrorMessage';
+import ErrorMessage from './ErrorMessage';
 
 const useStyles = makeStyles({
   card: {
@@ -27,7 +27,7 @@ export interface UserCardProps extends RouteComponentProps {
 const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate, history }) => {
   const classes = useStyles();
   const [isLocked, setIsLocked] = useState(user.status === 'locked');
-  const [errorInfo, setErrorInfo] = useState<Error>({
+  const [errorInfo, setErrorInfo] = useState<ErrorInfo>({
     isError: false,
     message: '',
   });
@@ -50,20 +50,13 @@ const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate, history }) =>
   };
 
   const renderErrorMessage = () => (
-    <>
-      <Box>
-        {errorInfo.message}
-      </Box>
-      <Button
-        variant="contained"
-        onClick={setErrorInfo({
-          isError: false,
-          message: '',
-        })}
-      >
-        OK :(
-      </Button>
-    </>
+    <ErrorMessage
+      errorInfo={errorInfo}
+      onClick={(_event) => setErrorInfo({
+        isError: false,
+        message: '',
+      })}
+    />
   );
 
   return (

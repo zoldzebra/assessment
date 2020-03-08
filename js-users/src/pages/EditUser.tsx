@@ -7,6 +7,8 @@ import {
 
 import { getUserById, updateUser, API } from '../utils/api';
 import { User } from '../types/User';
+import { ErrorInfo } from '../types/ErrorInfo';
+import ErrorMessage from '../components/ErrorMessage';
 
 interface RouteParams {
   id: string;
@@ -26,9 +28,9 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
   };
   const [user, setUser] = useState<User>(emptyState);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorInfo, setErrorInfo] = useState({
+  const [errorInfo, setErrorInfo] = useState<ErrorInfo>({
     isError: false,
-    message: null,
+    message: '',
   });
   const { params } = match;
   const { id } = params;
@@ -80,11 +82,20 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
     }
   };
 
+  const renderErrorMessage = () => (
+    <ErrorMessage
+      errorInfo={errorInfo}
+      onClick={(_event) => setErrorInfo({
+        isError: false,
+        message: '',
+      })}
+    />
+  );
 
   return (
     <Paper>
       Edit user
-      <Input name="firstName" value={user.first_name} onChange={handleInputs} />
+      <Input name="firstName" value={user?.first_name} onChange={handleInputs} />
       <Input name="lastName" value={user?.last_name} onChange={handleInputs} />
       <Button
         variant="contained"
@@ -98,6 +109,7 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
       >
         Back
       </Button>
+      {errorInfo.isError && renderErrorMessage()}
     </Paper>
   );
 };

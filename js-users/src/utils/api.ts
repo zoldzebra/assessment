@@ -46,3 +46,21 @@ export const updateUser = async (newUser: User) => {
     throw new Error(`Updating user failed: ${error.message}`);
   }
 };
+
+export const addNewUser = async (firstName: string, lastName: string) => {
+  try {
+    console.log('addNew called');
+    const newUser = {
+      first_name: firstName,
+      last_name: lastName,
+      status: 'active',
+    };
+    const response = await axios.post(
+      API_USERS,
+      newUser,
+    );
+    console.log('add resp', response);
+  } catch (error) {
+    throw new Error(`Adding user failed: ${error.message}`);
+  }
+};

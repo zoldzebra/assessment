@@ -1,14 +1,14 @@
 import React from 'react';
 import { Button, Box } from '@material-ui/core';
 
-import { Error } from '../types/Error';
+import { ErrorInfo } from '../types/ErrorInfo';
 
 export interface ErrorMessageProps {
-  errorInfo: Error;
-  onClick: () => void;
+  errorInfo: ErrorInfo;
+  onClick: (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ errorInfo, onCLick }) => {
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ errorInfo, onClick }) => {
   const { message } = errorInfo;
 
 
@@ -19,9 +19,9 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ errorInfo, onCLick }) => {
       </Box>
       <Button
         variant="contained"
-        onClick={onCLick()}
+        onClick={onClick}
       >
-        OK :(
+        OK!
       </Button>
     </>
   );
