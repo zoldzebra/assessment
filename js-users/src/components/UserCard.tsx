@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import { Paper, Box, makeStyles, FormGroup, FormControlLabel, Switch, Button } from '@material-ui/core';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
+import {
+  Paper, Box, makeStyles, FormGroup, FormControlLabel, Switch, Button,
+} from '@material-ui/core';
 
 import { User } from '../types/User';
-import { updateStatus } from '../utils/api';
+import { Error } from '../types/Error';
+import { updateUser } from '../utils/api';
+import { ErrorMessage } from './ErrorMessage';
 
 const useStyles = makeStyles({
   card: {
@@ -14,24 +19,24 @@ const useStyles = makeStyles({
   },
 });
 
-export interface UserCardProps {
+export interface UserCardProps extends RouteComponentProps {
   user: User;
   onStatusUpdate: (id: number) => void;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate }) => {
+const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate, history }) => {
   const classes = useStyles();
   const [isLocked, setIsLocked] = useState(user.status === 'locked');
-  const [errorInfo, setErrorInfo] = useState({
+  const [errorInfo, setErrorInfo] = useState<Error>({
     isError: false,
-    message: null,
+    message: '',
   });
 
   const handleStatusChange = async () => {
     try {
       const newUser = { ...user };
       newUser.status = isLocked ? 'active' : 'locked';
-      const update = await updateStatus(newUser);
+      const update = await updateUser(newUser);
       if (update) {
         setIsLocked(!isLocked);
         onStatusUpdate(user.id);
@@ -44,24 +49,22 @@ const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate }) => {
     }
   };
 
-  const renderErrorMessage = () => {
-    return (
-      <>
-        <Box>
-          {errorInfo.message}
-        </Box>
-        <Button
-          variant="contained"
-          onClick={() => setErrorInfo({
-            isError: false,
-            message: null,
-          })}
-        >
-          {`OK :(`}
-        </Button>
-      </>
-    );
-  };
+  const renderErrorMessage = () => (
+    <>
+      <Box>
+        {errorInfo.message}
+      </Box>
+      <Button
+        variant="contained"
+        onClick={setErrorInfo({
+          isError: false,
+          message: '',
+        })}
+      >
+        OK :(
+      </Button>
+    </>
+  );
 
   return (
     <Paper className={classes.card}>
@@ -81,9 +84,15 @@ const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate }) => {
           }
         />
       </FormGroup>
+      <Button
+        variant="contained"
+        onClick={() => history.push(`/main/edit/${user.id}`)}
+      >
+        Edit user
+      </Button>
       {errorInfo.isError && renderErrorMessage()}
     </Paper>
   );
 };
 
-export default UserCard;
+export default withRouter(UserCard);

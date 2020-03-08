@@ -3,6 +3,7 @@ import { makeStyles, CircularProgress } from '@material-ui/core';
 
 import { getUsers, getUserById } from '../utils/api';
 import { User } from '../types/User';
+import { Error } from '../types/Error';
 import UserList from '../components/UserList';
 
 const useStyles = makeStyles({
@@ -17,9 +18,9 @@ const MainPage: React.FC<MainPageProps> = (props) => {
   const classes = useStyles();
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorInfo, setErrorInfo] = useState({
+  const [errorInfo, setErrorInfo] = useState<Error>({
     isError: false,
-    message: null,
+    message: '',
   });
 
   useEffect(() => {
@@ -46,6 +47,11 @@ const MainPage: React.FC<MainPageProps> = (props) => {
     const newUsers = [...users];
     newUsers[oldUserIndex] = Object.assign(newUsers[oldUserIndex], updatedUser);
     setUsers(newUsers);
+  };
+
+  const findUserById = (id: number) => {
+    const selectedUser = users.find((user) => user.id === id);
+    console.log('selectedUser', selectedUser);
   };
 
   return (
