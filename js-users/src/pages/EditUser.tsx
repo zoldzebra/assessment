@@ -64,6 +64,11 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
       const saved = await updateUser(user);
       if (saved) {
         history.push('/main');
+      } else {
+        setErrorInfo({
+          isError: true,
+          message: 'Something went wrong while saving, try again after reload.',
+        });
       }
     } catch (error) {
       setErrorInfo({

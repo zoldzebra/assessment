@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { makeStyles, CircularProgress, Fab } from '@material-ui/core';
+import { makeStyles, Fab } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 
 import { getUsers, getUserById } from '../utils/api';
@@ -10,7 +10,12 @@ import UserList from '../components/UserList';
 
 const useStyles = makeStyles({
   card: {
-    padding: '10px',
+    padding: '16px',
+  },
+  addButton: {
+    position: 'absolute',
+    top: '2vh',
+    right: '5vw',
   },
 });
 
@@ -53,12 +58,11 @@ const MainPage: React.FC<MainPageProps> = ({ history }) => {
 
   return (
     <>
-      {isLoading && <CircularProgress />}
       {errorInfo.isError && errorInfo.message ? errorInfo.message : null}
-      <Fab color="primary" onClick={() => history.push('/main/new')}>
+      <Fab color="primary" onClick={() => history.push('/main/new')} className={classes.addButton}>
         <Add fontSize="large" />
       </Fab>
-      <UserList users={users} onStatusUpdate={updateUserById} />
+      <UserList users={users} onStatusUpdate={updateUserById} isLoading={isLoading} />
     </>
   );
 };

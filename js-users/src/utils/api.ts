@@ -41,7 +41,9 @@ export const updateUser = async (newUser: User) => {
       newUser,
     );
     console.log('updateStatus resp', response);
-    if (response) return true;
+    if (response && response.status >= 200 && response.status < 300) return true;
+    // eslint-disable-next-line no-console
+    console.error(response);
     return false;
   } catch (error) {
     throw new Error(`Updating user failed: ${error.message}`);

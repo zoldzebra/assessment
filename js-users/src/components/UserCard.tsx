@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import {
-  Paper, Box, makeStyles, FormGroup, FormControlLabel, Switch, Button,
+  Paper,
+  Box,
+  makeStyles,
+  FormControlLabel,
+  Switch,
+  Button,
+  Table,
+  TableBody,
+  TableRow,
+  TableCell,
+  Grid,
 } from '@material-ui/core';
 
 import { User } from '../types/User';
@@ -11,11 +21,16 @@ import ErrorMessage from './ErrorMessage';
 
 const useStyles = makeStyles({
   card: {
-    minWidth: 650,
-    padding: '10px',
+    padding: '16px',
   },
   strikethrough: {
     textDecoration: 'line-through',
+  },
+  tableCell: {
+    padding: 0,
+  },
+  actionArea: {
+    marginTop: '16px',
   },
 });
 
@@ -59,31 +74,72 @@ const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate, history }) =>
     />
   );
 
+  const getReadableDate = (dateString: string) => {
+    const fullDate = new Date(dateString);
+    const date = fullDate.toDateString();
+    const hours = fullDate.getHours();
+    const minutes = fullDate.getMinutes();
+    const seconds = fullDate.getSeconds();
+    return `${date} ${hours}:${minutes}:${seconds}`;
+  };
+
   return (
-    <Paper className={classes.card}>
-      <Box className={`${isLocked && classes.strikethrough}`}>{`${user.id}`}</Box>
-      <Box className={`${isLocked && classes.strikethrough}`}>{`${user.first_name} ${user.last_name}`} </Box>
-      <FormGroup>
-        <FormControlLabel
-          label={user.status}
-          control={
-            (
-              <Switch
-                checked={!isLocked}
-                onChange={handleStatusChange}
-                color="primary"
+    <Paper className={classes.card} elevation={3}>
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell className={classes.tableCell}>
+              User:
+            </TableCell>
+            <TableCell>
+              <Box className={`${isLocked && classes.strikethrough} `}>{`${user.first_name} ${user.last_name} `} </Box>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              Created at:
+            </TableCell>
+            <TableCell>
+              <Box className={`${isLocked && classes.strikethrough} `}>{`${getReadableDate(user.created_at)} `}</Box>
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>
+              Status:
+            </TableCell>
+            <TableCell>
+              <FormControlLabel
+                control={
+                  (
+                    <Switch
+                      checked={!isLocked}
+                      onChange={handleStatusChange}
+                      color="primary"
+                      size="small"
+                    />
+                  )
+                }
+                label={user.status}
               />
-            )
-          }
-        />
-      </FormGroup>
-      <Button
-        variant="contained"
-        onClick={() => history.push(`/main/edit/${user.id}`)}
-      >
-        Edit user
-      </Button>
-      {errorInfo.isError && renderErrorMessage()}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+      <Grid container justify="center" className={classes.actionArea}>
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="small"
+            onClick={() => history.push(`/main/edit/${user.id}`)}
+          >
+            Edit user
+          </Button>
+        </Grid>
+        <Grid item>
+          {errorInfo.isError && renderErrorMessage()}
+        </Grid>
+      </Grid>
     </Paper>
   );
 };

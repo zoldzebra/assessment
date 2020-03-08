@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Paper, Button, makeStyles, Grid,
+  Paper, Button, makeStyles, Grid, CircularProgress,
 } from '@material-ui/core';
 
 import { User } from '../types/User';
@@ -8,16 +8,22 @@ import UserCard from './UserCard';
 
 const useStyles = makeStyles({
   userListContainer: {
-    padding: '10px',
+    width: '100%',
+    height: '100%',
+    padding: '16px',
+  },
+  spinnerGrid: {
+    height: '500px',
   },
 });
 
 export interface UserListProps {
   users: User[];
   onStatusUpdate: (id: number) => void;
+  isLoading: boolean;
 }
 
-const UserList: React.FC<UserListProps> = ({ users, onStatusUpdate }) => {
+const UserList: React.FC<UserListProps> = ({ users, onStatusUpdate, isLoading }) => {
   const classes = useStyles();
   const USERS_PER_PAGE = 10;
   const [actualPage, setActualPage] = useState(0);
@@ -50,23 +56,46 @@ const UserList: React.FC<UserListProps> = ({ users, onStatusUpdate }) => {
     const actualPageUsers = users.slice(pagination.start, pagination.end);
 
     return actualPageUsers.map((user) => (
-      <Grid item key={user.id}>
+      <Grid item key={user.id} xs={12} sm={6}>
         <UserCard user={user} onStatusUpdate={onStatusUpdate} />
       </Grid>
     ));
   };
 
-  return (
-    <Paper>
-      <Grid container spacing={2}>
-        {users.length > 0 && renderUserCards()}
+  const renderNav = () => (
+    <>
+      <Button color="secondary" onClick={() => stepPagination('down')}>Previous</Button>
+      {`${showPage} / ${totalPages}`}
+      <Button color="secondary" onClick={() => stepPagination('up')}>Next</Button>
+    </>
+  );
+
+  const renderContent = () => {
+    if (!isLoading) {
+      return (
+        <>
+          <Grid container alignItems="center" justify="center">
+            {renderNav()}
+          </Grid>
+          <Grid container direction="row" spacing={2}>
+            {renderUserCards()}
+          </Grid>
+        </>
+      );
+    }
+    return (
+      <Grid container alignItems="center" justify="center" className={classes.spinnerGrid}>
+        <CircularProgress size="12rem" />
       </Grid>
-      {users.length > 0
-        && `${users.length} users. Showing ${USERS_PER_PAGE}/page. Total pages: ${totalPages}`}
-      <Button onClick={() => stepPagination('down')}>Previous</Button>
-      {users.length > 0 && `page ${showPage} / ${totalPages}`}
-      <Button onClick={() => stepPagination('up')}>Next</Button>
-    </Paper>
+    );
+  };
+
+  return (
+    <>
+      <Paper className={classes.userListContainer} elevation={2}>
+        {renderContent()}
+      </Paper>
+    </>
   );
 };
 
