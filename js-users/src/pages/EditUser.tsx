@@ -58,7 +58,6 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
   };
 
   const handleSave = async () => {
-    console.log('handleSave');
     try {
       const saved = await updateUser(user);
       if (saved) {
