@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { makeStyles, Fab } from '@material-ui/core';
+import { makeStyles, Fab, Grid } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 
 import { getUsers, getUserById } from '../utils/api';
@@ -56,13 +56,27 @@ const MainPage: React.FC<MainPageProps> = ({ history }) => {
     setUsers(newUsers);
   };
 
+  const renderContent = () => {
+    if (errorInfo.isError) {
+      return (
+        <Grid container alignItems="center" justify="center">
+          {errorInfo.message}
+        </Grid>
+      );
+    }
+    return (
+      <>
+        <Fab color="primary" onClick={() => history.push('/main/new')} className={classes.addButton}>
+          <Add fontSize="large" />
+        </Fab>
+        <UserList users={users} onStatusUpdate={updateUserById} isLoading={isLoading} />
+      </>
+    );
+  };
+
   return (
     <>
-      {errorInfo.isError && errorInfo.message ? errorInfo.message : null}
-      <Fab color="primary" onClick={() => history.push('/main/new')} className={classes.addButton}>
-        <Add fontSize="large" />
-      </Fab>
-      <UserList users={users} onStatusUpdate={updateUserById} isLoading={isLoading} />
+      {renderContent()}
     </>
   );
 };

@@ -1,7 +1,17 @@
 import React from 'react';
-import { Button, Box } from '@material-ui/core';
+import { Button, Box, Grid, makeStyles } from '@material-ui/core';
 
 import { ErrorInfo } from '../types/ErrorInfo';
+
+const useStyles = makeStyles({
+  errorContainer: {
+    padding: '16px',
+  },
+  message: {
+    padding: '16px',
+  },
+
+});
 
 export interface ErrorMessageProps {
   errorInfo: ErrorInfo;
@@ -9,21 +19,22 @@ export interface ErrorMessageProps {
 }
 
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ errorInfo, onClick }) => {
+  const classes = useStyles();
   const { message } = errorInfo;
 
-
   return (
-    <>
-      <Box>
+    <Grid container direction="column" alignItems="center" justify="center" className={classes.errorContainer}>
+      <Box className={classes.message}>
         {message}
       </Box>
       <Button
         variant="contained"
+        color="secondary"
         onClick={onClick}
       >
-        OK!
+        I am sad.
       </Button>
-    </>
+    </Grid>
   );
 };
 

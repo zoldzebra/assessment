@@ -136,9 +136,9 @@ const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate, history }) =>
             Edit user
           </Button>
         </Grid>
-        <Grid item>
-          {errorInfo.isError && renderErrorMessage()}
-        </Grid>
+      </Grid>
+      <Grid item>
+        {errorInfo.isError && renderErrorMessage()}
       </Grid>
     </Paper>
   );

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { Paper } from '@material-ui/core';
 
 import { getUserById, updateUser } from '../utils/api';
 import { User } from '../types/User';
@@ -89,16 +88,17 @@ const EditUser: React.FC<EditUserProps> = ({ match, history }) => {
   );
 
   return (
-    <Paper>
+    <>
       <AddOrEditUserForm
         title="Edit user"
         firstName={user.first_name}
         lastName={user.last_name}
         handleInputs={handleInputs}
         handleSave={handleSave}
+        disableButtons={errorInfo.isError}
       />
       {errorInfo.isError && renderErrorMessage()}
-    </Paper>
+    </>
   );
 };
 

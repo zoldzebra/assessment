@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import {
-  Paper, Button, makeStyles, Grid, CircularProgress,
+  Button, makeStyles, Grid, CircularProgress,
 } from '@material-ui/core';
 
 import { User } from '../types/User';
 import UserCard from './UserCard';
 
 const useStyles = makeStyles({
-  userListContainer: {
-    width: '100%',
-    height: '100%',
-    padding: '16px',
-  },
   spinnerGrid: {
     height: '500px',
   },
@@ -92,9 +87,7 @@ const UserList: React.FC<UserListProps> = ({ users, onStatusUpdate, isLoading })
 
   return (
     <>
-      <Paper className={classes.userListContainer} elevation={2}>
-        {renderContent()}
-      </Paper>
+      {renderContent()}
     </>
   );
 };
