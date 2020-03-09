@@ -19,6 +19,9 @@ export function createAppTheme(options: ThemeOptions) {
         rounded: {
           borderRadius: '20px',
         },
+        elevation3: {
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+        },
       },
     },
     ...options,

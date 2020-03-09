@@ -1,6 +1,8 @@
 import React from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { Grid, Button, Input, makeStyles, Box } from '@material-ui/core';
+import {
+  Grid, Button, Input, makeStyles, Box,
+} from '@material-ui/core';
 
 const useStyles = makeStyles({
   title: {

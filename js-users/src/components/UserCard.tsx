@@ -26,11 +26,17 @@ const useStyles = makeStyles({
   strikethrough: {
     textDecoration: 'line-through',
   },
+  name: {
+    fontWeight: 'bold',
+  },
   tableCell: {
     padding: 0,
   },
   actionArea: {
     marginTop: '16px',
+  },
+  attributeNameCell: {
+    width: '40%',
   },
 });
 
@@ -88,11 +94,11 @@ const UserCard: React.FC<UserCardProps> = ({ user, onStatusUpdate, history }) =>
       <Table>
         <TableBody>
           <TableRow>
-            <TableCell className={classes.tableCell}>
+            <TableCell className={`${classes.tableCell} ${classes.attributeNameCell}`}>
               User:
             </TableCell>
             <TableCell>
-              <Box className={`${isLocked && classes.strikethrough} `}>{`${user.first_name} ${user.last_name} `} </Box>
+              <Box className={`${isLocked && classes.strikethrough} ${classes.name}`}>{`${user.first_name} ${user.last_name} `} </Box>
             </TableCell>
           </TableRow>
           <TableRow>

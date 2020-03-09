@@ -15,7 +15,7 @@ const useStyles = makeStyles({
   addButton: {
     position: 'absolute',
     top: '2vh',
-    right: '5vw',
+    right: '2vw',
   },
 });
 

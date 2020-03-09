@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Box, Grid, makeStyles } from '@material-ui/core';
+import {
+  Button, Box, Grid, makeStyles,
+} from '@material-ui/core';
 
 import { ErrorInfo } from '../types/ErrorInfo';
 

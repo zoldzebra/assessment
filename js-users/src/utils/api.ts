@@ -11,7 +11,9 @@ export const getUsers = async () => {
     const response = await axios.get(
       API_USERS,
     );
-    return response.data;
+    const users = response.data;
+    users.sort((a: User, b: User) => a.id - b.id);
+    return users;
   } catch (error) {
     throw new Error(`Getting users failed: ${error.message}`);
   }

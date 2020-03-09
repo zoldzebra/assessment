@@ -10,6 +10,9 @@ const useStyles = makeStyles({
   spinnerGrid: {
     height: '500px',
   },
+  pagination: {
+    marginTop: '16px',
+  },
 });
 
 export interface UserListProps {
@@ -59,9 +62,9 @@ const UserList: React.FC<UserListProps> = ({ users, onStatusUpdate, isLoading })
 
   const renderNav = () => (
     <>
-      <Button color="secondary" onClick={() => stepPagination('down')}>Previous</Button>
+      <Button color="secondary" disabled={showPage === 1} onClick={() => stepPagination('down')}>Previous</Button>
       {`${showPage} / ${totalPages}`}
-      <Button color="secondary" onClick={() => stepPagination('up')}>Next</Button>
+      <Button color="secondary" disabled={showPage === totalPages} onClick={() => stepPagination('up')}>Next</Button>
     </>
   );
 
@@ -69,18 +72,18 @@ const UserList: React.FC<UserListProps> = ({ users, onStatusUpdate, isLoading })
     if (!isLoading) {
       return (
         <>
-          <Grid container alignItems="center" justify="center">
-            {renderNav()}
-          </Grid>
-          <Grid container direction="row" spacing={2}>
+          <Grid container direction="row" spacing={3}>
             {renderUserCards()}
+          </Grid>
+          <Grid container alignItems="center" justify="center" className={classes.pagination}>
+            {renderNav()}
           </Grid>
         </>
       );
     }
     return (
       <Grid container alignItems="center" justify="center" className={classes.spinnerGrid}>
-        <CircularProgress size="12rem" />
+        <CircularProgress size="8rem" />
       </Grid>
     );
   };
