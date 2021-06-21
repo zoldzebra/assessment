@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 import { TodoService } from './todoService';
+import { dbPathByEnv } from '../dbPathByEnv';
 
 const TODO_1 = {
 	'id': 1,
@@ -15,8 +16,8 @@ const TODO_2 = {
 	'done': false
 };
 
-const testDBPath = './db/testDb.json';
-const todoService = new TodoService(testDBPath);
+const todoService = new TodoService();
+const testDBPath = dbPathByEnv();
 
 describe('TodoService', () => {
 	beforeAll(() => {

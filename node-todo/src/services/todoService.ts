@@ -1,11 +1,13 @@
 import fs from 'fs';
 
+import { dbPathByEnv } from '../dbPathByEnv';
+
 export class TodoService {
   todos: string;
   dbPath: string;
 
-  constructor(dbPath: string) {
-    this.dbPath = dbPath;
+  constructor() {
+    this.dbPath = dbPathByEnv();
     this.todos = '';
   }
 

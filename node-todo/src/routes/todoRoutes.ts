@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { TodoService } from '../services/todoService';
 
 export const todoRouter = Router();
-const todoService = new TodoService('./db/prodDb.json');
+const todoService = new TodoService();
 
 todoRouter.get('/', (req, res) => res.send('Hello World!'));
 

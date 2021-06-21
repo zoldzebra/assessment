@@ -2,8 +2,6 @@ import supertest from 'supertest';
 
 import { app } from './app';
 
-const testDb = './db/testDb';
-
 describe('The app', () => {
 
 	it('GET / should answer \'Hello World!', async () => {
