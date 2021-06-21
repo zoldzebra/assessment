@@ -2,8 +2,11 @@ import supertest from 'supertest';
 
 import { app } from './app';
 
+const testDb = './db/testDb';
+
 describe('The app', () => {
-	it('should answer \'Hello World! on GET /', async () => {
+
+	it('GET / should answer \'Hello World!', async () => {
 		const response = await supertest(app).get('/').send();
 		expect(response.statusCode).toEqual(200);
 		expect(response.text).toBe('Hello World!');
