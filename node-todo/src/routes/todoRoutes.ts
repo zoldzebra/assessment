@@ -66,4 +66,13 @@ todoRouter.put('/todos/:id', (req, res) => {
       message: 'Invalid JSON input.'
     });
   }
-})
+});
+
+todoRouter.delete('/todos/:id', (req, res) => {
+  const id = req.params.id;
+  const result = todoService.deleteTodo(id);
+  if (!result) {
+    return res.sendStatus(404);
+  }
+  return res.json(result);
+});

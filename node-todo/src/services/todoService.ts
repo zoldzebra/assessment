@@ -59,4 +59,16 @@ export class TodoService {
     fs.writeFileSync(this.dbPath, JSON.stringify(updatedAllTodos));
     return updatedTodo;
   }
+
+  deleteTodo(id: string): string | null {
+    const allTodos = this.getAllTodos();
+    const todo = allTodos.find(todo => todo.id === id);
+    if (!todo) {
+      return null;
+    }
+    const allTodosWithoutDeleted = allTodos
+      .filter(todo => todo.id !== id);
+    fs.writeFileSync(this.dbPath, JSON.stringify(allTodosWithoutDeleted));
+    return id;
+  }
 }

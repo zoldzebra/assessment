@@ -43,9 +43,9 @@ describe('TodoService', () => {
     });
 
 		it('should return all todos from db', () => {
-      const todos = [TODO_1, TODO_2];
-			fs.writeFileSync(testDBPath, JSON.stringify(todos));
       const todoService = new TodoService();
+      const todos = [TODO_1, TODO_2];
+      writeToDb(todos);
 
 			const results = todoService.getAllTodos();
 
@@ -63,10 +63,9 @@ describe('TodoService', () => {
 
       todoService.saveTodo(NEW_TODO);
 
-      const buffer = fs.readFileSync(testDBPath, 'utf8');
-      const rawTodos = JSON.parse(buffer);
+      const dbTodos = readFromDb();
       
-      expect(rawTodos.length).toEqual(1);
+      expect(dbTodos.length).toEqual(1);
     });
 
     it('should return the saved todo with id field', () => {
@@ -103,7 +102,7 @@ describe('TodoService', () => {
   describe('getTodo', () => {
     it('should return todo by id', () => {
       const todoService = new TodoService();
-			fs.writeFileSync(testDBPath, JSON.stringify([TODO_1]));
+      writeToDb([TODO_1]);
 
       const result = todoService.getTodo(TODO_1.id);
 
@@ -131,14 +130,13 @@ describe('TodoService', () => {
         priority: 2,
         done: false
       };
-      fs.writeFileSync(testDBPath, JSON.stringify([TODO_1]));
+      writeToDb([TODO_1]);
 
       todoService.updateTodo(TODO_1.id, updateInput);
 
-      const buffer = fs.readFileSync(testDBPath, 'utf8');
-      const todos = JSON.parse(buffer);
+      const dbTodos = readFromDb();
 
-      expect(todos[0]).toEqual(updatedTodo);
+      expect(dbTodos[0]).toEqual(updatedTodo);
     });
 
     it('should return the updated todo', () => {
@@ -152,7 +150,7 @@ describe('TodoService', () => {
         priority: 2,
         done: false
       };
-      fs.writeFileSync(testDBPath, JSON.stringify([TODO_1]));
+      writeToDb([TODO_1]);
       
       const result = todoService.updateTodo(TODO_1.id, updateInput);
 
@@ -168,8 +166,51 @@ describe('TodoService', () => {
     });
   });
 
+  describe('deleteTodo', () => {
+    it('should delete todo by id', () => {
+      const todoService = new TodoService();
+      const todos = [TODO_1, TODO_2];
+      writeToDb(todos);
+
+      todoService.deleteTodo(TODO_1.id);
+
+      const dbTodos = readFromDb()
+
+      expect(dbTodos.length).toBe(1);
+      expect(dbTodos[0]).toEqual(TODO_2);      
+    });
+
+    it('should return id if delete successful', () => {
+      const todoService = new TodoService();
+      writeToDb([TODO_1]);
+
+      const result = todoService.deleteTodo(TODO_1.id);
+
+      expect(result).toBe(TODO_1.id);
+    });
+
+    it('should return null if todo not found', () => {
+      const todoService = new TodoService();
+      writeToDb([TODO_1]);
+
+      const result = todoService.deleteTodo('badId');
+
+      expect(result).toBeNull;
+    })
+  });
+
 });
 
 const purgeTestDb = () => {
 	fs.writeFileSync(testDBPath, JSON.stringify([]));
 };
+
+const writeToDb = (todos: Todo[]) => {
+  fs.writeFileSync(testDBPath, JSON.stringify(todos));
+}
+
+const readFromDb = (): Todo[] => {
+  const buffer = fs.readFileSync(testDBPath, 'utf8');
+  const dbTodos: Todo[] = JSON.parse(buffer);
+  return dbTodos;
+}
