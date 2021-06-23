@@ -27,6 +27,7 @@ export class TodoService {
       id: uuidv4(),
       priority: newTodo.priority || this.DEFAULT_PRIORITY,
       done: newTodo.done || this.DEFAULT_DONE,
+      doneTimestamp: newTodo.done ? this.getDateNowTimestamp() : undefined,
       ...newTodo,
     };
 
@@ -48,12 +49,7 @@ export class TodoService {
     if (!todo) {
       return null;
     }
-    if (updateInput.done && !todo.done) {
-      todo.doneTimeStamp = Math.round(Date.now() / 1000);
-    }
-    if (updateInput.done === false && todo.done) {
-      todo.doneTimeStamp = undefined;
-    }
+    this.handleDoneTimestamp(todo, updateInput);
     const updatedTodo: Todo = Object.assign(todo, updateInput);
 
     const updatedAllTodos = allTodos.map(todo => {
@@ -77,5 +73,36 @@ export class TodoService {
       .filter(todo => todo.id !== id);
     fs.writeFileSync(this.dbPath, JSON.stringify(allTodosWithoutDeleted));
     return id;
+  }
+
+  deleteExpiredDoneTodosJob(expirationMins: number, checkIntervalSecs: number) {
+    const expirationSecs = expirationMins * 60;
+    setInterval(() => {
+      const allTodos = this.getAllTodos();
+      const timeNow = this.getDateNowTimestamp();
+      const expiredTodos = allTodos.filter(todo => {
+        if (todo.done && todo.doneTimestamp) {
+          return (todo.doneTimestamp + expirationSecs) < timeNow;
+        }
+      });
+      if (expiredTodos.length) {
+        expiredTodos.forEach(expiredTodo => {
+          this.deleteTodo(expiredTodo.id);
+        });
+      }
+    }, checkIntervalSecs * 1000);
+  }
+
+  private handleDoneTimestamp(todo: Todo, updateInput: UpdateTodo) {
+    if (updateInput.done && !todo.done) {
+      todo.doneTimestamp = this.getDateNowTimestamp();
+    }
+    if (updateInput.done === false && todo.done) {
+      todo.doneTimestamp = undefined;
+    }
+  }
+
+  private getDateNowTimestamp(): number {
+    return Math.round(Date.now() / 1000);
   }
 }

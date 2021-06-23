@@ -1,6 +1,6 @@
 export interface Todo extends NewTodo {
   id: string,
-  doneTimeStamp?: number,
+  doneTimestamp?: number,
 };
 
 export interface UpdateTodo extends NewTodo {

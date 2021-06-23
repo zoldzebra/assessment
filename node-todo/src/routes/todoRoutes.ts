@@ -6,6 +6,7 @@ import { isNewTodoValid, isUpdateTodoValid } from '../model/validate';
 
 export const todoRouter = Router();
 const todoService = new TodoService();
+todoService.deleteExpiredDoneTodosJob(1, 0.2);
 
 todoRouter.get('/', (req, res) => res.send('Hello World!'));
 

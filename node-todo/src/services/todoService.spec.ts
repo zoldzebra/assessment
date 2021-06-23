@@ -55,6 +55,7 @@ describe('TodoService', () => {
 
   describe('saveTodo', () => {
     beforeEach (() => {
+      jest.restoreAllMocks();
       purgeTestDb();
     });
 
@@ -97,9 +98,33 @@ describe('TodoService', () => {
       expect(retVal).toHaveProperty('priority', 3);
       expect(retVal).toHaveProperty('done', false);
     });
+
+    it('should add doneTimestamp only if todo is saved as done', () => {
+      const todoService = new TodoService();
+      const doneTodo: NewTodo = {
+        text: 'I am so done',
+        done: true,
+      };
+      const undoneTodo: NewTodo = {
+        text: 'I am so undone',
+        done: false,
+      };
+      jest.spyOn(Date, 'now').mockImplementation(() => {
+        return 12345678000;
+      });
+
+      const doneResult = todoService.saveTodo(doneTodo);
+      const undoneResult = todoService.saveTodo(undoneTodo);
+
+      expect(doneResult).toHaveProperty('doneTimestamp', 12345678);
+      expect(undoneResult).toHaveProperty('doneTimestamp', undefined);
+    })
   });
 
   describe('getTodo', () => {
+    beforeEach (() => {
+      purgeTestDb();
+    });
     it('should return todo by id', () => {
       const todoService = new TodoService();
       writeToDb([TODO_1]);
@@ -119,6 +144,11 @@ describe('TodoService', () => {
   });
 
   describe('updateTodo', () => {
+    beforeEach (() => {
+      jest.restoreAllMocks();
+      purgeTestDb();
+    });
+
     it('should save the updated todo into the db', () => {
       const todoService = new TodoService();
       const updateInput: UpdateTodo = {
@@ -170,12 +200,14 @@ describe('TodoService', () => {
       const updateInput: UpdateTodo = {
         done: true,
       };
-      writeToDb([TODO_1]);
+      writeToDb([TODO_1])
+      jest.spyOn(Date, 'now').mockImplementation(() => {
+        return 12345678000;
+      });
+      
+      const result = todoService.updateTodo(TODO_1.id, updateInput);
 
-      todoService.updateTodo(TODO_1.id, updateInput);
-
-      const dbTodos = readFromDb();
-      expect(dbTodos[0]).toHaveProperty('doneTimeStamp');
+      expect(result).toHaveProperty('doneTimestamp', 12345678);
     });
 
     it('should remove doneTimeStamp if todo switched from done to undone', () => {
@@ -185,21 +217,24 @@ describe('TodoService', () => {
         text: 'done todo',
         priority: 3,
         done: true,
-        doneTimeStamp: 1234,
+        doneTimestamp: 1234,
       }
       const updateInput: UpdateTodo = {
         done: false,
       };
       writeToDb([doneTodo]);
 
-      todoService.updateTodo(doneTodo.id, updateInput);
+      const result = todoService.updateTodo(doneTodo.id, updateInput);
 
-      const dbTodos = readFromDb();
-      expect(dbTodos[0]).not.toHaveProperty('doneTimeStamp');
+      expect(result).toHaveProperty('doneTimestamp', undefined);
     })
   });
 
   describe('deleteTodo', () => {
+    beforeEach (() => {
+      purgeTestDb();
+    });
+
     it('should delete todo by id', () => {
       const todoService = new TodoService();
       const todos = [TODO_1, TODO_2];
@@ -210,7 +245,7 @@ describe('TodoService', () => {
       const dbTodos = readFromDb()
 
       expect(dbTodos.length).toBe(1);
-      expect(dbTodos[0]).toEqual(TODO_2);      
+      expect(dbTodos[0]).toEqual(TODO_2);
     });
 
     it('should return id if delete successful', () => {
@@ -230,6 +265,56 @@ describe('TodoService', () => {
 
       expect(result).toBeNull;
     })
+  });
+
+  describe('deleteExpiredDoneTodosJob', () => {
+    beforeEach (() => {
+      jest.restoreAllMocks();
+      purgeTestDb();
+    });
+    
+    it('should delete only expired todos', () => {
+      const todoService = new TodoService();
+      jest.useFakeTimers();
+      const doneTodo1: Todo = {
+        id: '123abc',
+        text: 'done todo',
+        priority: 3,
+        done: true,
+        doneTimestamp: 1234,
+      }
+      const doneTodo2: Todo = {
+        id: '123abc123',
+        text: 'done todo2',
+        priority: 3,
+        done: true,
+        doneTimestamp: 1234,
+      }
+      const doneInTheFuture: Todo = {
+        id: '123abc123asd',
+        text: 'done todo2',
+        priority: 3,
+        done: true,
+        doneTimestamp: Date.now(),
+      }
+      const undoneTodo: Todo = {
+        id: '123abc123asd',
+        text: 'done todo2',
+        priority: 3,
+        done: false,
+      }
+      const todos = [doneTodo1, doneTodo2, doneInTheFuture, undoneTodo];
+      writeToDb(todos);
+
+      todoService.deleteExpiredDoneTodosJob(1, 2);
+      jest.advanceTimersToNextTimer();
+
+      const dbTodos = readFromDb();
+      expect(dbTodos.length).toBe(2);
+      expect(dbTodos[0]).toEqual(doneInTheFuture);
+      expect(dbTodos[1]).toEqual(undoneTodo);
+      jest.clearAllTimers();
+    });
   });
 
 });
