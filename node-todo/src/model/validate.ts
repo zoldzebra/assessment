@@ -13,9 +13,14 @@ const newTodoJsonSchema: JSONSchemaType<NewTodo> = {
     priority: { type: "integer", range: [1, 5], nullable: true },
     done: { type: "boolean", nullable: true },
   },
+  additionalProperties: false,
   required: ["text"],
-  additionalProperties: false
 };
 
+const updateTodoJsonSchema: JSONSchemaType<NewTodo> = {
+  ...newTodoJsonSchema,
+  required: [],
+};
 
 export const isNewTodoValid = ajv.compile(newTodoJsonSchema);
+export const isUpdateTodoValid = ajv.compile(updateTodoJsonSchema);

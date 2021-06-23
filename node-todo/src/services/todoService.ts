@@ -37,8 +37,26 @@ export class TodoService {
   }
 
   getTodo(id: string): Todo | null {
-    let allTodos = this.getAllTodos();
+    const allTodos = this.getAllTodos();
     const todo = allTodos.find(todo => todo.id === id);
     return todo || null;
+  }
+
+  updateTodo(id: string, newTodo: NewTodo): Todo | null {
+    const allTodos = this.getAllTodos();
+    const todo = allTodos.find(todo => todo.id === id);
+    if (!todo) {
+      return null;
+    }
+    const updatedTodo: Todo = Object.assign(todo, newTodo);
+    const updatedAllTodos = allTodos.map(todo => {
+      if (todo.id === id) {
+        return updatedTodo;
+      } else {
+        return todo;
+      }
+    });
+    fs.writeFileSync(this.dbPath, JSON.stringify(updatedAllTodos));
+    return updatedTodo;
   }
 }

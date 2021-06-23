@@ -1,7 +1,7 @@
-import { isNewTodoValid } from './validate';
+import { isNewTodoValid, isUpdateTodoValid } from './validate';
 
 describe('JSON Validation', () => {
-  describe('validateNewTodo', () => {
+  describe('isNewTodoValid', () => {
     it('should accept new todo with all fields', () => {
       const newTodo = {
         'text': 'New TODO',
@@ -136,4 +136,18 @@ describe('JSON Validation', () => {
       expect(isNewTodoValid(newTodo3)).toBe(false);
     });
   });
+
+  describe('isUpdateTodoValid', () => {
+    it('should accept done and priority properties by themselves', () => {
+      const updateTodo1 = {
+        'done': false
+      };
+      const updateTodo2 = {
+        'priority': 2
+      };
+      
+      expect(isUpdateTodoValid(updateTodo1)).toBe(true);
+      expect(isUpdateTodoValid(updateTodo2)).toBe(true);
+    });
+  })
 });

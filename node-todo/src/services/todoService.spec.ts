@@ -119,6 +119,55 @@ describe('TodoService', () => {
     });
   });
 
+  describe('updateTodo', () => {
+    it('should save the updated todo into the db', () => {
+      const todoService = new TodoService();
+      const updateInput: NewTodo = {
+        text: 'Updated text here'
+      };
+      const updatedTodo: Todo = {
+        id: '1',
+        text: 'Updated text here',
+        priority: 2,
+        done: false
+      };
+      fs.writeFileSync(testDBPath, JSON.stringify([TODO_1]));
+
+      todoService.updateTodo(TODO_1.id, updateInput);
+
+      const buffer = fs.readFileSync(testDBPath, 'utf8');
+      const todos = JSON.parse(buffer);
+
+      expect(todos[0]).toEqual(updatedTodo);
+    });
+
+    it('should return the updated todo', () => {
+      const todoService = new TodoService();
+      const updateInput: NewTodo = {
+        text: 'Updated text here'
+      };
+      const updatedTodo: Todo = {
+        id: '1',
+        text: 'Updated text here',
+        priority: 2,
+        done: false
+      };
+      fs.writeFileSync(testDBPath, JSON.stringify([TODO_1]));
+      
+      const result = todoService.updateTodo(TODO_1.id, updateInput);
+
+      expect(result).toEqual(updatedTodo);
+    });
+
+    it('should return null if todo not found', () => {
+      const todoService = new TodoService();
+      
+      const result = todoService.updateTodo('dummiId', {} as NewTodo);
+
+      expect(result).toBeNull;
+    });
+  });
+
 });
 
 const purgeTestDb = () => {
