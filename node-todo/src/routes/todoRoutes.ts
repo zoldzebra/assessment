@@ -46,10 +46,10 @@ todoRouter.get('/todos/:id', (req, res) => {
 
 todoRouter.put('/todos/:id', (req, res) => {
   const id = req.params.id;
-  const newTodo = req.body;
-  if (isUpdateTodoValid(newTodo)) {
+  const updateInput = req.body;
+  if (isUpdateTodoValid(updateInput)) {
     try {
-      const updatedTodo =  todoService.updateTodo(id, newTodo);
+      const updatedTodo =  todoService.updateTodo(id, updateInput);
       if (!updatedTodo) {
         return res.sendStatus(404);
       }

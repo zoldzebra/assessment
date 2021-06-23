@@ -1,7 +1,7 @@
 import Ajv, { JSONSchemaType, Plugin } from 'ajv';
 import range from 'ajv-keywords';
 
-import { NewTodo } from './todo';
+import { NewTodo, UpdateTodo } from './todo';
 
 const ajv = new Ajv();
 range(ajv);
@@ -17,8 +17,14 @@ const newTodoJsonSchema: JSONSchemaType<NewTodo> = {
   required: ["text"],
 };
 
-const updateTodoJsonSchema: JSONSchemaType<NewTodo> = {
-  ...newTodoJsonSchema,
+const updateTodoJsonSchema: JSONSchemaType<UpdateTodo> = {
+  type: "object",
+  properties: {
+    text: { type: "string", nullable: true },
+    priority: { type: "integer", range: [1, 5], nullable: true },
+    done: { type: "boolean", nullable: true },
+  },
+  additionalProperties: false,
   required: [],
 };
 

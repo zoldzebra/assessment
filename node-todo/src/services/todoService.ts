@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Todo, NewTodo } from '../model/todo';
+import { Todo, NewTodo, UpdateTodo } from '../model/todo';
 import { dbPathByEnv } from '../dbPathByEnv';
 
 export class TodoService {
@@ -42,13 +42,20 @@ export class TodoService {
     return todo || null;
   }
 
-  updateTodo(id: string, newTodo: NewTodo): Todo | null {
+  updateTodo(id: string, updateInput: UpdateTodo): Todo | null {
     const allTodos = this.getAllTodos();
     const todo = allTodos.find(todo => todo.id === id);
     if (!todo) {
       return null;
     }
-    const updatedTodo: Todo = Object.assign(todo, newTodo);
+    if (updateInput.done && !todo.done) {
+      todo.doneTimeStamp = Math.round(Date.now() / 1000);
+    }
+    if (updateInput.done === false && todo.done) {
+      todo.doneTimeStamp = undefined;
+    }
+    const updatedTodo: Todo = Object.assign(todo, updateInput);
+
     const updatedAllTodos = allTodos.map(todo => {
       if (todo.id === id) {
         return updatedTodo;

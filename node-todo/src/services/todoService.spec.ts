@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { NewTodo, Todo } from '../model/todo';
+import { NewTodo, UpdateTodo, Todo } from '../model/todo';
 import { TodoService } from './todoService';
 import { dbPathByEnv } from '../dbPathByEnv';
 
@@ -10,13 +10,13 @@ const TODO_1: Todo = {
 	'priority': 2,
 	'done': false
 };
-const TODO_2 = {
+const TODO_2: Todo = {
 	'id': '2',
 	'text': 'Test todo 2',
 	'priority': 3,
 	'done': false
 };
-const NEW_TODO = {
+const NEW_TODO: NewTodo = {
   'text': 'New TODO',
 	'priority': 3,
 	'done': false
@@ -121,7 +121,7 @@ describe('TodoService', () => {
   describe('updateTodo', () => {
     it('should save the updated todo into the db', () => {
       const todoService = new TodoService();
-      const updateInput: NewTodo = {
+      const updateInput: UpdateTodo = {
         text: 'Updated text here'
       };
       const updatedTodo: Todo = {
@@ -141,7 +141,7 @@ describe('TodoService', () => {
 
     it('should return the updated todo', () => {
       const todoService = new TodoService();
-      const updateInput: NewTodo = {
+      const updateInput: UpdateTodo = {
         text: 'Updated text here'
       };
       const updatedTodo: Todo = {
@@ -164,6 +164,39 @@ describe('TodoService', () => {
 
       expect(result).toBeNull;
     });
+
+    it('should add doneTimeStamp to todo if its updated to done', () => {
+      const todoService = new TodoService();
+      const updateInput: UpdateTodo = {
+        done: true,
+      };
+      writeToDb([TODO_1]);
+
+      todoService.updateTodo(TODO_1.id, updateInput);
+
+      const dbTodos = readFromDb();
+      expect(dbTodos[0]).toHaveProperty('doneTimeStamp');
+    });
+
+    it('should remove doneTimeStamp if todo switched from done to undone', () => {
+      const todoService = new TodoService();
+      const doneTodo: Todo = {
+        id: '123abc',
+        text: 'done todo',
+        priority: 3,
+        done: true,
+        doneTimeStamp: 1234,
+      }
+      const updateInput: UpdateTodo = {
+        done: false,
+      };
+      writeToDb([doneTodo]);
+
+      todoService.updateTodo(doneTodo.id, updateInput);
+
+      const dbTodos = readFromDb();
+      expect(dbTodos[0]).not.toHaveProperty('doneTimeStamp');
+    })
   });
 
   describe('deleteTodo', () => {
