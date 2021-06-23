@@ -34,3 +34,12 @@ todoRouter.post('/todos', (req, res) => {
     });
   }
 });
+
+todoRouter.get('/todos/:id', (req, res) => {
+  const id = req.params.id;
+  const todo = todoService.getTodo(id);
+  if (!todo) {
+    return res.sendStatus(404);
+  }
+  return res.json(todo);
+})

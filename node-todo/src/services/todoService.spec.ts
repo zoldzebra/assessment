@@ -97,8 +97,28 @@ describe('TodoService', () => {
 
       expect(retVal).toHaveProperty('priority', 3);
       expect(retVal).toHaveProperty('done', false);
-    });    
-  })
+    });
+  });
+
+  describe('getTodo', () => {
+    it('should return todo by id', () => {
+      const todoService = new TodoService();
+			fs.writeFileSync(testDBPath, JSON.stringify([TODO_1]));
+
+      const result = todoService.getTodo(TODO_1.id);
+
+      expect(result).toStrictEqual(TODO_1);
+    });
+
+    it('should return null if id not found', () => {
+      const todoService = new TodoService();
+
+      const result = todoService.getTodo(TODO_1.id);
+
+      expect(result).toBeNull;
+    });
+  });
+
 });
 
 const purgeTestDb = () => {
