@@ -23,6 +23,8 @@ const NEW_TODO: NewTodo = {
 }
 
 const testDBPath = dbPathByEnv();
+const todoService = new TodoService();
+
 
 describe('TodoService', () => {
   afterAll(() => {
@@ -35,15 +37,12 @@ describe('TodoService', () => {
     });
 
     it('should return empty array if db is empty', () => {
-      const todoService = new TodoService();
-
       const results = todoService.getAllTodos();
 
       expect(results).toStrictEqual([]);
     });
 
 		it('should return all todos from db', () => {
-      const todoService = new TodoService();
       const todos = [TODO_1, TODO_2];
       writeToDb(todos);
 
@@ -60,8 +59,6 @@ describe('TodoService', () => {
     });
 
     it('should save new todo into db', () => {
-      const todoService = new TodoService();
-
       todoService.saveTodo(NEW_TODO);
 
       const dbTodos = readFromDb();
@@ -70,7 +67,6 @@ describe('TodoService', () => {
     });
 
     it('should return the saved todo with id field', () => {
-      const todoService = new TodoService();
       const expectedTodoFields = {
         text: 'New TODO',
         priority: 3,
@@ -84,7 +80,6 @@ describe('TodoService', () => {
     });
 
     it('should append default values for priority and done if not given', () => {
-      const todoService = new TodoService();
       const noPrioNewTodo: NewTodo = {
         text: 'I have no prio nor done',
       };
@@ -100,7 +95,6 @@ describe('TodoService', () => {
     });
 
     it('should add doneTimestamp only if todo is saved as done', () => {
-      const todoService = new TodoService();
       const doneTodo: NewTodo = {
         text: 'I am so done',
         done: true,
@@ -126,7 +120,6 @@ describe('TodoService', () => {
       purgeTestDb();
     });
     it('should return todo by id', () => {
-      const todoService = new TodoService();
       writeToDb([TODO_1]);
 
       const result = todoService.getTodo(TODO_1.id);
@@ -135,8 +128,6 @@ describe('TodoService', () => {
     });
 
     it('should return null if id not found', () => {
-      const todoService = new TodoService();
-
       const result = todoService.getTodo(TODO_1.id);
 
       expect(result).toBeNull;
@@ -150,7 +141,6 @@ describe('TodoService', () => {
     });
 
     it('should save the updated todo into the db', () => {
-      const todoService = new TodoService();
       const updateInput: UpdateTodo = {
         text: 'Updated text here'
       };
@@ -170,7 +160,6 @@ describe('TodoService', () => {
     });
 
     it('should return the updated todo', () => {
-      const todoService = new TodoService();
       const updateInput: UpdateTodo = {
         text: 'Updated text here'
       };
@@ -188,15 +177,12 @@ describe('TodoService', () => {
     });
 
     it('should return null if todo not found', () => {
-      const todoService = new TodoService();
-      
       const result = todoService.updateTodo('dummiId', {} as NewTodo);
 
       expect(result).toBeNull;
     });
 
     it('should add doneTimeStamp to todo if its updated to done', () => {
-      const todoService = new TodoService();
       const updateInput: UpdateTodo = {
         done: true,
       };
@@ -211,7 +197,6 @@ describe('TodoService', () => {
     });
 
     it('should remove doneTimeStamp if todo switched from done to undone', () => {
-      const todoService = new TodoService();
       const doneTodo: Todo = {
         id: '123abc',
         text: 'done todo',
@@ -236,7 +221,6 @@ describe('TodoService', () => {
     });
 
     it('should delete todo by id', () => {
-      const todoService = new TodoService();
       const todos = [TODO_1, TODO_2];
       writeToDb(todos);
 
@@ -249,7 +233,6 @@ describe('TodoService', () => {
     });
 
     it('should return id if delete successful', () => {
-      const todoService = new TodoService();
       writeToDb([TODO_1]);
 
       const result = todoService.deleteTodo(TODO_1.id);
@@ -258,7 +241,6 @@ describe('TodoService', () => {
     });
 
     it('should return null if todo not found', () => {
-      const todoService = new TodoService();
       writeToDb([TODO_1]);
 
       const result = todoService.deleteTodo('badId');
@@ -300,7 +282,6 @@ describe('TodoService', () => {
       purgeTestDb();
     });
     it('should delete only expired todos', () => {
-      const todoService = new TodoService();
       jest.spyOn(Date, 'now').mockImplementation(() => {
         return 5678000;
       });

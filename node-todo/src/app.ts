@@ -5,6 +5,6 @@ import { todoRouter } from './routes/todoRoutes';
 
 const app = express();
 app.use(bodyParser.json());
-app.use(todoRouter);
+app.use('/todos', todoRouter);
 
 export { app };
