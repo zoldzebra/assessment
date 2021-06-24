@@ -7,11 +7,14 @@ import { dbPathByEnv } from '../dbPathByEnv';
 export class TodoService {
   private readonly DEFAULT_PRIORITY = 3;
   private readonly DEFAULT_DONE = false;
+  private readonly EXPIRATION_SECS = 5 * 60;
+  private readonly EXPIRATION_CHECK_SECS = 1 * 60;
 
   dbPath: string;
 
   constructor() {
     this.dbPath = dbPathByEnv();
+    this.deleteExpiredDoneTodosJob();
   }
 
   getAllTodos(): Todo[] {
@@ -27,7 +30,7 @@ export class TodoService {
       id: uuidv4(),
       priority: newTodo.priority || this.DEFAULT_PRIORITY,
       done: newTodo.done || this.DEFAULT_DONE,
-      doneTimestamp: newTodo.done ? this.getDateNowTimestamp() : undefined,
+      doneTimestamp: newTodo.done ? this.getDateNowSecs() : undefined,
       ...newTodo,
     };
 
@@ -75,34 +78,38 @@ export class TodoService {
     return id;
   }
 
-  deleteExpiredDoneTodosJob(expirationMins: number, checkIntervalSecs: number) {
-    const expirationSecs = expirationMins * 60;
-    setInterval(() => {
-      const allTodos = this.getAllTodos();
-      const timeNow = this.getDateNowTimestamp();
-      const expiredTodos = allTodos.filter(todo => {
-        if (todo.done && todo.doneTimestamp) {
-          return (todo.doneTimestamp + expirationSecs) < timeNow;
-        }
-      });
-      if (expiredTodos.length) {
-        expiredTodos.forEach(expiredTodo => {
-          this.deleteTodo(expiredTodo.id);
-        });
+  deleteExpiredDoneTodosJob() {
+    const job = setInterval(() => {
+      this.deleteExpiredTodos();
+    }, this.EXPIRATION_CHECK_SECS * 1000);
+    job.unref();
+  }
+
+  deleteExpiredTodos = () => {
+    const allTodos = this.getAllTodos();
+    const timeNowSecs = this.getDateNowSecs();
+    const expiredTodos = allTodos.filter(todo => {
+      if (todo.done && todo.doneTimestamp) {
+        return (todo.doneTimestamp + this.EXPIRATION_SECS) < timeNowSecs;
       }
-    }, checkIntervalSecs * 1000);
+    });
+    if (expiredTodos.length) {
+      expiredTodos.forEach(expiredTodo => {
+        this.deleteTodo(expiredTodo.id);
+      });
+    }
   }
 
   private handleDoneTimestamp(todo: Todo, updateInput: UpdateTodo) {
     if (updateInput.done && !todo.done) {
-      todo.doneTimestamp = this.getDateNowTimestamp();
+      todo.doneTimestamp = this.getDateNowSecs();
     }
     if (updateInput.done === false && todo.done) {
       todo.doneTimestamp = undefined;
     }
   }
 
-  private getDateNowTimestamp(): number {
+  private getDateNowSecs(): number {
     return Math.round(Date.now() / 1000);
   }
 }

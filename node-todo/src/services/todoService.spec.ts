@@ -268,14 +268,42 @@ describe('TodoService', () => {
   });
 
   describe('deleteExpiredDoneTodosJob', () => {
-    beforeEach (() => {
+    beforeAll(() => {
+      jest.useFakeTimers();
+    })
+    afterAll(() => {
       jest.restoreAllMocks();
-      purgeTestDb();
+      jest.runOnlyPendingTimers();
+      jest.useRealTimers();
     });
     
+    it('should call deleteExpiredTodos in intervals', () => {
+      const todoService = new TodoService();
+      const spy = jest.spyOn(todoService, 'deleteExpiredTodos');
+
+      expect(todoService.deleteExpiredTodos).not.toBeCalled();
+      
+      jest.advanceTimersToNextTimer();
+      
+      expect(todoService.deleteExpiredTodos).toHaveBeenCalledTimes(1);
+
+      spy.mockClear();
+      jest.advanceTimersToNextTimer();
+      
+      expect(todoService.deleteExpiredTodos).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('deleteExpiredTodos', () => {
+    afterAll(() => {
+      jest.restoreAllMocks()
+      purgeTestDb();
+    });
     it('should delete only expired todos', () => {
       const todoService = new TodoService();
-      jest.useFakeTimers();
+      jest.spyOn(Date, 'now').mockImplementation(() => {
+        return 5678000;
+      });
       const doneTodo1: Todo = {
         id: '123abc',
         text: 'done todo',
@@ -306,16 +334,14 @@ describe('TodoService', () => {
       const todos = [doneTodo1, doneTodo2, doneInTheFuture, undoneTodo];
       writeToDb(todos);
 
-      todoService.deleteExpiredDoneTodosJob(1, 2);
-      jest.advanceTimersToNextTimer();
+      todoService.deleteExpiredTodos();
 
       const dbTodos = readFromDb();
       expect(dbTodos.length).toBe(2);
       expect(dbTodos[0]).toEqual(doneInTheFuture);
       expect(dbTodos[1]).toEqual(undoneTodo);
-      jest.clearAllTimers();
     });
-  });
+  })
 
 });
 
